@@ -5,6 +5,8 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -13,15 +15,15 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 /**
  * @ApiResource(
- *     routePrefix="/adminSysteme",
+ *     routePrefix="/adminsysteme",
  *  attributes={
  *          "pagination_enabled"=true,
  *           "pagination_items_per_page"=4,
- *           "security"="is_granted('ROLE_adminSysteme')",
+ *           "security"="is_granted('ROLE_AdminSysteme')",
  *           "security_message"="Vous n'avez pas access à cette Ressource"
  *         },
- *      collectionOperations={},
- *      itemOperations={},
+ *      collectionOperations={"post","get"},
+ *      itemOperations={"put","get","delete"},
  *         normalizationContext={"groups"={"user:read"}},
  *         denormalizationContext={"groups"={"user:write"}}
  * )
@@ -37,14 +39,14 @@ class User implements UserInterface
      * @ORM\Column(type="integer")
      * @Groups({"user:write","user:read"})
      */
-    protected $id;
+    private $id;
 
     /**
      * @Assert\NotBlank( message="le username est obligatoire" )
      * @Groups({"user:read","user:write","profil:read","profil:write"})
      * @ORM\Column(type="string", length=180, unique=true)
      */
-    protected $username;
+    private $username;
 
 
     protected $roles = [];
@@ -53,14 +55,14 @@ class User implements UserInterface
      * @var string The hashed password
      * @ORM\Column(type="string")
      */
-    protected $password;
+    private $password;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le name est obligatoire" )
      * @Groups({"user:read","user:write","profil:read","profil:write"})
      */
-    protected $nom;
+    private $nom;
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -74,34 +76,59 @@ class User implements UserInterface
      * @Assert\NotBlank( message="l'email est obligatoire" )
      * @Groups({"user:read","user:write","profil:read","profil:write"})
      */
-    protected $email;
+    private $email;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le telephone est obligatoire" )
      * @Groups({"user:read","user:write","profil:read","profil:write"})
      */
-    protected $telephone;
+    private $telephone;
 
     /**
      * @ORM\Column(type="blob")
      * @Assert\NotBlank( message="le photo est obligatoire" )
      * @Groups({"user:read","user:write","profil:read","profil:write"})
      */
-    protected $photo;
+    private $photo;
 
     /**
      * @ORM\Column(type="boolean")
      *
      */
-    protected $archivage = 0;
+    private $archivage = 0;
 
     /**
      * @ORM\ManyToOne(targetEntity=Profils::class, inversedBy="users")
      * @Assert\NotBlank( message="le profile est obligatoire" )
-     * @Groups({"user:read","Profil:read","user:write"})
+     * @Groups({"user:read","user:write"})
      */
     private $profil;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Compte::class, mappedBy="users")
+     * @Groups({"user:read","user:write"})
+     */
+    private $comptes;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Agence::class, mappedBy="users")
+     * @Groups({"user:read","user:write"})
+     */
+    private $agences;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Transactions::class, mappedBy="users")
+     * @Groups({"user:read","user:write"})
+     */
+    private $transactions;
+
+    public function __construct()
+    {
+        $this->comptes = new ArrayCollection();
+        $this->agences = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -229,7 +256,18 @@ class User implements UserInterface
 
     public function getPhoto()
     {
-        return $this->photo;
+        if($this->photo)
+        {
+            $data = stream_get_contents($this->photo);
+            if(!$this->photo){
+
+                fclose($this->photo);
+            }
+            return base64_encode($data);
+        }else
+        {
+            return null;
+        }
     }
 
     public function setPhoto($photo): self
@@ -259,6 +297,96 @@ class User implements UserInterface
     public function setProfil(?Profils $profil): self
     {
         $this->profil = $profil;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Compte[]
+     */
+    public function getComptes(): Collection
+    {
+        return $this->comptes;
+    }
+
+    public function addCompte(Compte $compte): self
+    {
+        if (!$this->comptes->contains($compte)) {
+            $this->comptes[] = $compte;
+            $compte->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompte(Compte $compte): self
+    {
+        if ($this->comptes->removeElement($compte)) {
+            // set the owning side to null (unless already changed)
+            if ($compte->getUsers() === $this) {
+                $compte->setUsers(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Agence[]
+     */
+    public function getAgences(): Collection
+    {
+        return $this->agences;
+    }
+
+    public function addAgence(Agence $agence): self
+    {
+        if (!$this->agences->contains($agence)) {
+            $this->agences[] = $agence;
+            $agence->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAgence(Agence $agence): self
+    {
+        if ($this->agences->removeElement($agence)) {
+            // set the owning side to null (unless already changed)
+            if ($agence->getUsers() === $this) {
+                $agence->setUsers(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transactions[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transactions $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transactions $transaction): self
+    {
+        if ($this->transactions->removeElement($transaction)) {
+            // set the owning side to null (unless already changed)
+            if ($transaction->getUsers() === $this) {
+                $transaction->setUsers(null);
+            }
+        }
 
         return $this;
     }

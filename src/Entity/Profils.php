@@ -13,15 +13,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 /**
  * @ApiResource(
- *      routePrefix="/adminSysteme",
+ *      routePrefix="/adminsysteme",
  *   attributes={
  *          "pagination_enabled"=true,
  *           "pagination_items_per_page"=4,
- *           "security"="is_granted('ROLE_adminSysteme')",
+ *           "security"="is_granted('ROLE_AdminSysteme')",
  *           "security_message"="Vous n'avez pas access à cette Ressource"
  *         },
- *      collectionOperations={},
- *      itemOperations={},
+ *      collectionOperations={"get", "post"},
+ *      itemOperations={"get","put","delete"},
  *         normalizationContext={"groups"={"profil:read"}},
  *         denormalizationContext={"groups"={"profil:write"}}
  * )

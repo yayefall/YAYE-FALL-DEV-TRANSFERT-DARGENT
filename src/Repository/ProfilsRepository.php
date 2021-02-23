@@ -20,7 +20,7 @@ class ProfilsRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return Profils[] Returns an array of Profils objects
+    //  * @return ProfilsFixture[] Returns an array of ProfilsFixture objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class ProfilsRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Profils
+    public function findOneBySomeField($value): ?ProfilsFixture
     {
         return $this->createQueryBuilder('p')
             ->andWhere('p.exampleField = :val')
