@@ -70,7 +70,7 @@ class Compte
     private $agences;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comptes")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comptes", cascade={"persist"})
      * @Groups({"compte:read","compte:write"})
      */
     private $users;

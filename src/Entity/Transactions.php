@@ -2,12 +2,29 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\TransactionsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *      routePrefix="/useragence",
+ *  attributes={
+ *          "pagination_enabled"=true,
+ *           "pagination_items_per_page"=4,
+ *           "security"="is_granted('ROLE_UserAgence')",
+ *           "security_message"="Vous n'avez pas access à cette Ressource"
+ *         },
+ *      collectionOperations={"post","get"},
+ *      itemOperations={"put","get","delete"},
+ *         normalizationContext={"groups"={"trans:read"}},
+ *         denormalizationContext={"groups"={"trans:write"}}
+ * )
+ * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=TransactionsRepository::class)
  */
 class Transactions
@@ -16,46 +33,63 @@ class Transactions
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"trans:read","trans:write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank( message="le code est obligatoire" )
+     * @Groups({"trans:read","trans:write"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank( message="le montant est obligatoire" )
+     * @Groups({"trans:read","trans:write"})
      */
     private $montant;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\NotBlank( message="la date est obligatoire" )
+     * @Groups({"trans:read","trans:write"})
      */
     private $creatAt;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank( message="le type est obligatoire" )
+     * @Groups({"trans:read","trans:write"})
      */
     private $typeTransaction;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank( message="la part Etat est obligatoire" )
+     * @Groups({"trans:read","trans:write"})
      */
     private $partEtat;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank( message="la part Entreprise est obligatoire" )
+     * @Groups({"trans:read","trans:write"})
      */
     private $partEntreprise;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank( message="la part AgenceRetrait est obligatoire" )
+     * @Groups({"trans:read","trans:write"})
      */
     private $partAgentRetrait;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank( message="la part AgenceDepot est obligatoire" )
+     * @Groups({"trans:read","trans:write"})
      */
     private $partAgentDepot;
 
@@ -66,11 +100,13 @@ class Transactions
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactions")
+     * @Groups({"trans:read","trans:write"})
      */
     private $users;
 
     /**
      * @ORM\OneToOne(targetEntity=Client::class, cascade={"persist", "remove"})
+     * @Groups({"trans:read","trans:write"})
      */
     private $clients;
 

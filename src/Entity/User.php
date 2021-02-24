@@ -12,21 +12,30 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter;
 
 /**
  * @ApiResource(
  *     routePrefix="/adminsysteme",
  *  attributes={
  *          "pagination_enabled"=true,
- *           "pagination_items_per_page"=4,
+ *           "pagination_items_per_page"=10,
  *           "security"="is_granted('ROLE_AdminSysteme')",
  *           "security_message"="Vous n'avez pas access à cette Ressource"
  *         },
- *      collectionOperations={"post","get"},
+ *      collectionOperations={"get",
+ *            "Add-user"={
+ *                  "method"="POST",
+ *                  "path"="/users",
+ *                  "route_name"="addUser",
+ *
+ *                  },
+ *         },
  *      itemOperations={"put","get","delete"},
  *         normalizationContext={"groups"={"user:read"}},
  *         denormalizationContext={"groups"={"user:write"}}
  * )
+ * @ApiFilter(BooleanFilter::class, properties={"profil"})
  * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
@@ -37,13 +46,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user:write","user:read"})
+     * @Groups({"user:write","user:read","compte:write","trans:write"})
      */
     private $id;
 
     /**
      * @Assert\NotBlank( message="le username est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $username;
@@ -60,35 +69,35 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le name est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le prenom est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
      */
     protected $prenom;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="l'email est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le telephone est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
      */
     private $telephone;
 
     /**
      * @ORM\Column(type="blob")
      * @Assert\NotBlank( message="le photo est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write"})
+     * @Groups({"user:write","profil:write","compte:write","trans:write"})
      */
     private $photo;
 
@@ -101,13 +110,12 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity=Profils::class, inversedBy="users")
      * @Assert\NotBlank( message="le profile est obligatoire" )
-     * @Groups({"user:read","user:write"})
+     * @Groups({"user:read","user:write","compte:write","trans:write"})
      */
     private $profil;
 
     /**
      * @ORM\OneToMany(targetEntity=Compte::class, mappedBy="users")
-     * @Groups({"user:read","user:write"})
      */
     private $comptes;
 
@@ -119,7 +127,6 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Transactions::class, mappedBy="users")
-     * @Groups({"user:read","user:write"})
      */
     private $transactions;
 
