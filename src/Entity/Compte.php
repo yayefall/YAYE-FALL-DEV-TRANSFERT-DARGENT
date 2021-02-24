@@ -15,8 +15,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      routePrefix="/adminsysteme",
  *   attributes={
  *          "pagination_enabled"=true,
- *           "pagination_items_per_page"=4,
- *           "security"="is_granted('ROLE_AdminSysteme')",
+ *           "pagination_items_per_page"=100,
+ *           "security"="(is_granted('ROLE_AdminSysteme') || is_granted('ROLE_Caissier'))",
  *           "security_message"="Vous n'avez pas access à cette Ressource"
  *         },
  *      collectionOperations={"get","post"},
@@ -33,7 +33,7 @@ class Compte
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"compte:read","compte:write"})
+     * @Groups({"compte:read","compte:write","client:write"})
      */
     private $id;
 
@@ -47,6 +47,9 @@ class Compte
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank( message="le montant est obligatoire" )
+     * @Assert\Length(
+     *     min=700000,
+     *     maxMessage="votre compte doit avoir au moins  700000 FCFA")
      * @Groups({"compte:read","compte:write"})
      */
     private $montant;

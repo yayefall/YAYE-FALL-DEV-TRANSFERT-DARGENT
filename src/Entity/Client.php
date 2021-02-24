@@ -2,12 +2,31 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *       routePrefix="/useragence",
+ *    attributes={
+ *           "pagination_enabled"=true,
+ *           "pagination_items_per_page"=100,
+ *           "security"="is_granted('ROLE_UserAgence')",
+ *           "security_message"="Vous n'avez pas access à cette Ressource"
+ *         },
+ *
+ *      collectionOperations={"post","get"},
+ *      itemOperations={"put","get","delete"},
+ *
+ *         normalizationContext={"groups"={"client:read"}},
+ *         denormalizationContext={"groups"={"client:write"}}
+ * )
+ * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=ClientRepository::class)
  */
 class Client
@@ -16,38 +35,64 @@ class Client
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"client:read","client:write","trans:write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank( message="le nomClient est obligatoire" )
+     * @Groups({"client:read","client:write"})
      */
     private $nomClient;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank( message="le nomBeneficiaire est obligatoire" )
+     * @Groups({"client:read","client:write"})
      */
     private $nomBeneficiaire;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank( message="le CNIclient est obligatoire" )
+     * @Assert\Length(
+     *     min=13,
+     *     max=13,
+     *     maxMessage="votre CNI ne depasse pas  13 chiffres")
+     * @Groups({"client:read","client:write"})
      */
     private $CNIClient;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank( message="le CNIbeneficiaire est obligatoire")
+     * @Assert\Length(
+     *     min=13,
+     *     max=13,
+     *     maxMessage="votre CNI ne depasse pas  13 chiffres")
+     * @Groups({"client:read","client:write"})
      */
     private $CNIBeneficiaire;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank( message="le telephoneClient est obligatoire" )
+     * @Groups({"client:read","client:write"})
      */
     private $telephoneClient;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank( message="le telephoneBeneficiaire est obligatoire" )
+     * @Groups({"client:read","client:write"})
      */
     private $telephoneBeneficiaire;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $archivage = 0;
 
     public function getId(): ?int
     {
@@ -122,6 +167,18 @@ class Client
     public function setTelephoneBeneficiaire(string $telephoneBeneficiaire): self
     {
         $this->telephoneBeneficiaire = $telephoneBeneficiaire;
+
+        return $this;
+    }
+
+    public function getArchivage(): ?bool
+    {
+        return $this->archivage;
+    }
+
+    public function setArchivage(bool $archivage): self
+    {
+        $this->archivage = $archivage;
 
         return $this;
     }

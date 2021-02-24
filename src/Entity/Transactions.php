@@ -12,15 +12,63 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
- *      routePrefix="/useragence",
+ *
  *  attributes={
  *          "pagination_enabled"=true,
- *           "pagination_items_per_page"=4,
- *           "security"="is_granted('ROLE_UserAgence')",
+ *           "pagination_items_per_page"=100,
+ *           "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence') )",
  *           "security_message"="Vous n'avez pas access à cette Ressource"
  *         },
- *      collectionOperations={"post","get"},
- *      itemOperations={"put","get","delete"},
+ *      collectionOperations={
+ *                "POST-transaction-for-UserAgence"={
+ *                         "method"="post",
+ *                         "path"="/useragence/transactions",
+ *                    },
+ *               "GET-transaction-for-UserAgence"={
+ *                          "method"="get",
+ *                          "path"="/useragence/transactions",
+ *                      },
+ *
+ *                "POST-transaction-for-AdminAgence"={
+ *                         "method"="post",
+ *                         "path"="/adminagence/transactions",
+ *                    },
+ *                "GET-transaction-for-AdminAgence"={
+ *                          "method"="get",
+ *                          "path"="/adminagence/transactions",
+ *                      },
+ *
+ *         },
+ *      itemOperations={
+ *              "PUT-transaction-for-UserAgence"={
+ *                         "method"="put",
+ *                         "path"="/useragence/transactions/{id}",
+ *                 },
+ *              "GET-transaction-for-UserAgence"={
+ *                          "method"="get",
+ *                          "path"="/useragence/transactions/{id}",
+ *                },
+ *              "DELETE-transaction-for-UserAgence"={
+ *                           "method"="delete",
+ *                          "path"="/useragence/transactions/{id}",
+ *               },
+ *
+ *
+ *
+ *               "PUT-transaction-for-AdminAgence"={
+ *                         "method"="put",
+ *                         "path"="/adminagence/transactions/{id}",
+ *                 },
+ *              "GET-transaction-for-AdminAgence"={
+ *                          "method"="get",
+ *                          "path"="/adminagence/transactions/{id}",
+ *                },
+ *              "DELETE-transaction-for-AdminAgence"={
+ *                           "method"="delete",
+ *                          "path"="/adminagence/transactions/{id}",
+ *               },
+ *        },
+ *
  *         normalizationContext={"groups"={"trans:read"}},
  *         denormalizationContext={"groups"={"trans:write"}}
  * )
@@ -47,6 +95,9 @@ class Transactions
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank( message="le montant est obligatoire" )
+     * @Assert\Length(
+     *     min=5000,
+     *     maxMessage="votre montant doit etre au moins  5000 FCFA")
      * @Groups({"trans:read","trans:write"})
      */
     private $montant;
@@ -89,7 +140,7 @@ class Transactions
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank( message="la part AgenceDepot est obligatoire" )
-     * @Groups({"trans:read","trans:write"})
+     * @Groups({"trans:read","trans:write","user:write"})
      */
     private $partAgentDepot;
 

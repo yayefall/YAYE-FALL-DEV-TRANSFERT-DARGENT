@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      routePrefix="/adminsysteme",
  *   attributes={
  *          "pagination_enabled"=true,
- *           "pagination_items_per_page"=4,
+ *           "pagination_items_per_page"=100,
  *           "security"="is_granted('ROLE_AdminSysteme')",
  *           "security_message"="Vous n'avez pas access à cette Ressource"
  *         },

@@ -8,34 +8,56 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ApiResource(
- *     routePrefix="/adminsysteme",
+ *
  *  attributes={
  *          "pagination_enabled"=true,
- *           "pagination_items_per_page"=10,
- *           "security"="is_granted('ROLE_AdminSysteme')",
+ *           "pagination_items_per_page"=100,
+ *           "security"="(is_granted('ROLE_AdminSysteme') || is_granted('ROLE_AdminAgence'))",
  *           "security_message"="Vous n'avez pas access à cette Ressource"
  *         },
- *      collectionOperations={"get",
+ *      collectionOperations={
  *            "Add-user"={
  *                  "method"="POST",
- *                  "path"="/users",
- *                  "route_name"="addUser",
+ *                  "path"="/adminsysteme/users",
  *
  *                  },
+ *            "Get-user"={
+ *                 "method"="get",
+ *                  "path"="/adminsysteme/users",
+ *               },
  *         },
- *      itemOperations={"put","get","delete"},
+ *      itemOperations={
+ *               "bloquer-userAgence"={
+ *                       "method"="delete",
+ *                        "path"="/adminagence/users/{id}",
+ *                     },
+ *               "bloquer-caissier"={
+ *                        "method"="delete",
+ *                        "path"="/adminsysteme/users/{id}",
+ *                     },
+ *                "get-users"={
+ *                      "method"="get",
+ *                       "path"="/adminsysteme/users/{id}",
+ *                     },
+ *                "put-users"={
+ *                        "method"="put",
+ *                         "path"="/adminsysteme/users/{id}",
+ *                   },
+ *            },
  *         normalizationContext={"groups"={"user:read"}},
  *         denormalizationContext={"groups"={"user:write"}}
  * )
- * @ApiFilter(BooleanFilter::class, properties={"profil"})
+ * @UniqueEntity("username","email")
+ * @ApiFilter(SearchFilter::class, properties={"profil.libelle"})
  * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
@@ -46,13 +68,14 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user:write","user:read","compte:write","trans:write"})
+     * @Groups({"user:write","user:read","compte:write","trans:write","agence:write"})
      */
     private $id;
 
     /**
+     * @Assert\Email(message="le username doit etre unique")
      * @Assert\NotBlank( message="le username est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $username;
@@ -69,35 +92,36 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le name est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le prenom est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
      */
     protected $prenom;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Assert\Email(message="l'email doit etre unique")
      * @Assert\NotBlank( message="l'email est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le telephone est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","trans:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
      */
     private $telephone;
 
     /**
      * @ORM\Column(type="blob")
      * @Assert\NotBlank( message="le photo est obligatoire" )
-     * @Groups({"user:write","profil:write","compte:write","trans:write"})
+     * @Groups({"user:write","profil:write","compte:write","agence:write"})
      */
     private $photo;
 
@@ -110,7 +134,7 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity=Profils::class, inversedBy="users")
      * @Assert\NotBlank( message="le profile est obligatoire" )
-     * @Groups({"user:read","user:write","compte:write","trans:write"})
+     * @Groups({"user:read","user:write","compte:write","agence:write"})
      */
     private $profil;
 

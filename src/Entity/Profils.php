@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter;
+
 /**
  * @ApiResource(
  *      routePrefix="/adminsysteme",
@@ -26,7 +26,6 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter;
  *         normalizationContext={"groups"={"profil:read"}},
  *         denormalizationContext={"groups"={"profil:write"}}
  * )
- * @ApiFilter(BooleanFilter::class, properties={"libelle"})
  * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=ProfilsRepository::class)
  */
@@ -43,7 +42,7 @@ class Profils
     /**
      * @ORM\Column(type="string", length=40)
      * @Assert\NotBlank( message="le libelle est obligatoire" )
-     * @Groups({"profil:read","user:read","profil:write","compte:write","trans:write"})
+     * @Groups({"profil:read","user:read","profil:write","compte:write"})
      */
     private $libelle;
 
