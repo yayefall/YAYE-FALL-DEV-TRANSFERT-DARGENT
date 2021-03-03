@@ -35,57 +35,57 @@ class Client
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"client:read","client:write","trans:write"})
+     * @Groups({"client:read","client:write","trans:write","trans:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank( message="le nomClient est obligatoire" )
-     * @Groups({"client:read","client:write"})
+     * @Groups({"client:read","client:write","trans:write","trans:read"})
      */
     private $nomClient;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank( message="le nomBeneficiaire est obligatoire" )
-     * @Groups({"client:read","client:write"})
+     * @Groups({"client:read","client:write","trans:write","trans:read"})
      */
     private $nomBeneficiaire;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\NotBlank( message="le CNIclient est obligatoire" )
      * @Assert\Length(
      *     min=13,
      *     max=13,
      *     maxMessage="votre CNI ne depasse pas  13 chiffres")
-     * @Groups({"client:read","client:write"})
+     * @Groups({"client:read","client:write","trans:write","trans:read"})
      */
     private $CNIClient;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\NotBlank( message="le CNIbeneficiaire est obligatoire")
      * @Assert\Length(
      *     min=13,
      *     max=13,
      *     maxMessage="votre CNI ne depasse pas  13 chiffres")
-     * @Groups({"client:read","client:write"})
+     * @Groups({"client:read","client:write","trans:write","trans:read"})
      */
     private $CNIBeneficiaire;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank( message="le telephoneClient est obligatoire" )
-     * @Groups({"client:read","client:write"})
+     * @Groups({"client:read","client:write","trans:write","trans:read"})
      */
     private $telephoneClient;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank( message="le telephoneBeneficiaire est obligatoire" )
-     * @Groups({"client:read","client:write"})
+     * @Groups({"client:read","client:write","trans:write","trans:read"})
      */
     private $telephoneBeneficiaire;
 

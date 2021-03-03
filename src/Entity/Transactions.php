@@ -16,61 +16,60 @@ use Symfony\Component\Validator\Constraints as Assert;
  *  attributes={
  *          "pagination_enabled"=true,
  *           "pagination_items_per_page"=100,
- *           "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence') )",
- *           "security_message"="Vous n'avez pas access à cette Ressource"
+ *
  *         },
  *      collectionOperations={
- *                "POST-transaction-for-UserAgence"={
- *                         "method"="post",
- *                         "path"="/useragence/transactions",
+ *                "Recharge-Compte"={
+ *                       "method"="post",
+ *                       "path"="/transactions/compte",
+ *                       "security"="(is_granted('ROLE_AdminSysteme')|| is_granted('ROLE_Caissier'))",
+ *                       "security_message"="Vous n'avez pas access à cette Ressource",
+ *                       "normalization_context"={"groups"={"trans:read"}},
+ *                       "denormalization_context"={"groups"={"trans:write"}},
  *                    },
- *               "GET-transaction-for-UserAgence"={
+ *               "GET-transaction"={
  *                          "method"="get",
  *                          "path"="/useragence/transactions",
+ *                          "security"="(is_granted('ROLE_UserAgence') || is_granted('ROLE_AdminAgence'))",
+ *                          "security_message"="Vous n'avez pas access à cette Ressource",
  *                      },
  *
- *                "POST-transaction-for-AdminAgence"={
- *                         "method"="post",
- *                         "path"="/adminagence/transactions",
- *                    },
- *                "GET-transaction-for-AdminAgence"={
- *                          "method"="get",
- *                          "path"="/adminagence/transactions",
- *                      },
+ *                "Transfert-Client"={
+ *                      "method"="post",
+ *                      "path"="/transactions/client",
+ *                      "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence'))",
+ *                      "security_message"="Vous n'avez pas access à cette Ressource",
+ *                      "normalization_context"={"groups"={"trans:read"}},
+ *                      "denormalization_context"={"groups"={"trans:write"}},
+ *                  },
  *
  *         },
  *      itemOperations={
- *              "PUT-transaction-for-UserAgence"={
- *                         "method"="put",
- *                         "path"="/useragence/transactions/{id}",
- *                 },
+ *              "Retrait-Client"={
+ *                        "method"="put",
+ *                        "path"="/transactions/client/{id}",
+ *                        "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence') )",
+ *                        "security_message"="Vous n'avez pas access à cette Ressource",
+ *                     },
  *              "GET-transaction-for-UserAgence"={
  *                          "method"="get",
- *                          "path"="/useragence/transactions/{id}",
- *                },
+ *                            "defaults"={"id"=null},
+ *                          "path"="/transactions/{id}",
+ *                          "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence') )",
+ *                          "security_message"="Vous n'avez pas access à cette Ressource",
+ *                      },
  *              "DELETE-transaction-for-UserAgence"={
- *                           "method"="delete",
- *                          "path"="/useragence/transactions/{id}",
- *               },
+ *                         "method"="delete",
+ *                         "path"="/transactions/{id}",
+ *                         "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence') )",
+ *                         "security_message"="Vous n'avez pas access à cette Ressource",
+ *                     },
  *
  *
- *
- *               "PUT-transaction-for-AdminAgence"={
- *                         "method"="put",
- *                         "path"="/adminagence/transactions/{id}",
- *                 },
- *              "GET-transaction-for-AdminAgence"={
- *                          "method"="get",
- *                          "path"="/adminagence/transactions/{id}",
- *                },
- *              "DELETE-transaction-for-AdminAgence"={
- *                           "method"="delete",
- *                          "path"="/adminagence/transactions/{id}",
- *               },
  *        },
  *
  *         normalizationContext={"groups"={"trans:read"}},
- *         denormalizationContext={"groups"={"trans:write"}}
+ *         denormalizationContext={"groups"={"trans:write"}},
  * )
  * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=TransactionsRepository::class)
@@ -87,7 +86,6 @@ class Transactions
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank( message="le code est obligatoire" )
      * @Groups({"trans:read","trans:write"})
      */
     private $code;
@@ -95,51 +93,42 @@ class Transactions
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank( message="le montant est obligatoire" )
-     * @Assert\Length(
-     *     min=5000,
-     *     maxMessage="votre montant doit etre au moins  5000 FCFA")
      * @Groups({"trans:read","trans:write"})
      */
     private $montant;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Assert\NotBlank( message="la date est obligatoire" )
      * @Groups({"trans:read","trans:write"})
      */
     private $creatAt;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank( message="le type est obligatoire" )
      * @Groups({"trans:read","trans:write"})
      */
     private $typeTransaction;
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank( message="la part Etat est obligatoire" )
      * @Groups({"trans:read","trans:write"})
      */
     private $partEtat;
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank( message="la part Entreprise est obligatoire" )
      * @Groups({"trans:read","trans:write"})
      */
     private $partEntreprise;
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank( message="la part AgenceRetrait est obligatoire" )
      * @Groups({"trans:read","trans:write"})
      */
     private $partAgentRetrait;
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank( message="la part AgenceDepot est obligatoire" )
      * @Groups({"trans:read","trans:write","user:write"})
      */
     private $partAgentDepot;
@@ -160,6 +149,12 @@ class Transactions
      * @Groups({"trans:read","trans:write"})
      */
     private $clients;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="transactions")
+     * @Groups({"trans:read","trans:write"})
+     */
+    private $comptes;
 
     public function getId(): ?int
     {
@@ -294,6 +289,18 @@ class Transactions
     public function setClients(?Client $clients): self
     {
         $this->clients = $clients;
+
+        return $this;
+    }
+
+    public function getComptes(): ?Compte
+    {
+        return $this->comptes;
+    }
+
+    public function setComptes(?Compte $comptes): self
+    {
+        $this->comptes = $comptes;
 
         return $this;
     }

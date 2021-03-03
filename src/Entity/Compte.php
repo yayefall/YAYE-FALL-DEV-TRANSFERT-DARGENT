@@ -5,6 +5,8 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CompteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -12,15 +14,47 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
- *      routePrefix="/adminsysteme",
+ *
  *   attributes={
  *          "pagination_enabled"=true,
  *           "pagination_items_per_page"=100,
- *           "security"="(is_granted('ROLE_AdminSysteme') || is_granted('ROLE_Caissier'))",
- *           "security_message"="Vous n'avez pas access à cette Ressource"
  *         },
- *      collectionOperations={"get","post"},
- *      itemOperations={"get","put","delete"},
+ *      collectionOperations={
+ *        "get-Compte-admin"={
+ *             "path"="/adminsysteme/compte",
+ *             "method"="get",
+ *             "security"="(is_granted('ROLE_AdminSysteme') or is_granted('ROLE_Caissier'))",
+ *             "security_message"="Vous n'avez pas access à cette Ressource",
+ *         },
+ *        "Post_Compte"={
+ *             "path"="/adminsysteme/compte",
+ *             "method"="POST",
+ *              "security"="(is_granted('ROLE_AdminSysteme'))",
+ *             "security_message"="Vous n'avez pas access à cette Ressource",
+ *            },
+ *       },
+ *      itemOperations={
+ *              "get-Compte"={
+ *                  "path"="/adminsysteme/compte/{id}",
+ *                  "method"="get",
+ *                  "security"="(is_granted('ROLE_AdminSysteme'))",
+ *                  "security_message"="Vous n'avez pas access à cette Ressource",
+ *
+ *                   },
+ *                "Recharge_Compte"={
+ *                    "path"="/adminsysteme/compte/{id}",
+ *                    "method"="PUT",
+ *                    "security"="(is_granted('ROLE_AdminSysteme')|| is_granted('ROLE_Caissier'))",
+ *                    "security_message"="Vous n'avez pas access à cette Ressource",
+ *
+ *                 },
+ *               "delete-Compte"={
+ *                      "path"="/adminsysteme/compte/{id}",
+ *                      "method"="delete",
+ *                      "security"="(is_granted('ROLE_AdminSysteme'))",
+ *                      "security_message"="Vous n'avez pas access à cette Ressource",
+ *                  },
+ *        },
  *         normalizationContext={"groups"={"compte:read"}},
  *         denormalizationContext={"groups"={"compte:write"}}
  * )
@@ -39,7 +73,6 @@ class Compte
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank( message="le code est obligatoire" )
      * @Groups({"compte:read","compte:write"})
      */
     private $code;
@@ -47,16 +80,12 @@ class Compte
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank( message="le montant est obligatoire" )
-     * @Assert\Length(
-     *     min=700000,
-     *     maxMessage="votre compte doit avoir au moins  700000 FCFA")
      * @Groups({"compte:read","compte:write"})
      */
-    private $montant;
+    private $solde;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Assert\NotBlank( message="le date est obligatoire" )
      * @Groups({"compte:read","compte:write"})
      */
     private $creatAt;
@@ -78,6 +107,16 @@ class Compte
      */
     private $users;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Transactions::class, mappedBy="comptes")
+     */
+    private $transactions;
+
+    public function __construct()
+    {
+        $this->transactions = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -95,14 +134,14 @@ class Compte
         return $this;
     }
 
-    public function getMontant(): ?int
+    public function getSolde(): ?int
     {
-        return $this->montant;
+        return $this->solde;
     }
 
-    public function setMontant(int $montant): self
+    public function setSolde(int $solde): self
     {
-        $this->montant = $montant;
+        $this->solde = $solde;
 
         return $this;
     }
@@ -151,6 +190,36 @@ class Compte
     public function setUsers(?User $users): self
     {
         $this->users = $users;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transactions[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transactions $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setComptes($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transactions $transaction): self
+    {
+        if ($this->transactions->removeElement($transaction)) {
+            // set the owning side to null (unless already changed)
+            if ($transaction->getComptes() === $this) {
+                $transaction->setComptes(null);
+            }
+        }
 
         return $this;
     }

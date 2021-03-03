@@ -21,42 +21,69 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *  attributes={
  *          "pagination_enabled"=true,
  *           "pagination_items_per_page"=100,
- *           "security"="(is_granted('ROLE_AdminSysteme') || is_granted('ROLE_AdminAgence'))",
- *           "security_message"="Vous n'avez pas access à cette Ressource"
- *         },
+ *
+ *          },
  *      collectionOperations={
  *            "Add-user"={
  *                  "method"="POST",
- *                  "path"="/adminsysteme/users",
+ *                  "path"="/adminsysteme/caissier",
+ *                   "route_name"="addCaissier",
  *
  *                  },
- *            "Get-user"={
+ *                 "post_agence"= {
+ *                      "method"= "POST",
+ *                      "path"="/adminagence/useragence",
+ *                     " route_name"="user_agence",
+ *                   },
+ *
+ *
+ *            "Get-user-caissier"={
  *                 "method"="get",
- *                  "path"="/adminsysteme/users",
+ *                  "path"="/adminsysteme/caissier",
+ *
+ *               },
+ *         "Get-user-agence"={
+ *                 "method"="get",
+ *                 "path"="/adminagence/useragence",
+ *
+ *               },
+ *        "Get-users"={
+ *                 "method"="get",
+ *                 "path"="/adminsysteme/users",
+ *
  *               },
  *         },
- *      itemOperations={
+ *       itemOperations={
  *               "bloquer-userAgence"={
  *                       "method"="delete",
- *                        "path"="/adminagence/users/{id}",
+ *                       "path"="/adminagence/useragence/{id}",
+ *
  *                     },
  *               "bloquer-caissier"={
  *                        "method"="delete",
- *                        "path"="/adminsysteme/users/{id}",
+ *                        "path"="/adminsysteme/caisier/{id}",
+ *
  *                     },
  *                "get-users"={
  *                      "method"="get",
- *                       "path"="/adminsysteme/users/{id}",
+ *                      "path"="/adminsysteme/users/{id}",
+ *
  *                     },
- *                "put-users"={
+ *                "put-caissier"={
  *                        "method"="put",
- *                         "path"="/adminsysteme/users/{id}",
+ *                        "path"="/adminsysteme/caissier/{id}",
+ *                        "route_name"="Edit-user",
+ *
+ *                   },
+ *                 "put-useragence"={
+ *                       "method"="put",
+ *                       "path"="/adminagence/useragence/{id}",
+ *
  *                   },
  *            },
  *         normalizationContext={"groups"={"user:read"}},
  *         denormalizationContext={"groups"={"user:write"}}
  * )
- * @UniqueEntity("username","email")
  * @ApiFilter(SearchFilter::class, properties={"profil.libelle"})
  * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -73,14 +100,15 @@ class User implements UserInterface
     private $id;
 
     /**
-     * @Assert\Email(message="le username doit etre unique")
      * @Assert\NotBlank( message="le username est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write","compte:read"})
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $username;
 
-
+    /**
+     * @Groups({"user:read","user:write","compte:write","compte:read","agence:write","trans:write"})
+     */
     protected $roles = [];
 
     /**
@@ -92,14 +120,14 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le name est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le prenom est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write"})
      */
     protected $prenom;
 
@@ -107,21 +135,20 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=100)
      * @Assert\Email(message="l'email doit etre unique")
      * @Assert\NotBlank( message="l'email est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le telephone est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","agence:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write"})
      */
     private $telephone;
 
     /**
-     * @ORM\Column(type="blob")
-     * @Assert\NotBlank( message="le photo est obligatoire" )
-     * @Groups({"user:write","profil:write","compte:write","agence:write"})
+     * @ORM\Column(type="blob",nullable=true)
+     * @Groups({"user:write","profil:write","compte:write","compte:read","agence:write","trans:write"})
      */
     private $photo;
 
@@ -134,12 +161,13 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity=Profils::class, inversedBy="users")
      * @Assert\NotBlank( message="le profile est obligatoire" )
-     * @Groups({"user:read","user:write","compte:write","agence:write"})
+     * @Groups({"user:read","user:write","compte:write","compte:read","agence:write","trans:write"})
      */
     private $profil;
 
     /**
      * @ORM\OneToMany(targetEntity=Compte::class, mappedBy="users")
+     *  @Groups({"user:read","user:write","trans:write"})
      */
     private $comptes;
 

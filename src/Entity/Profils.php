@@ -19,7 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  *          "pagination_enabled"=true,
  *           "pagination_items_per_page"=4,
  *           "security"="is_granted('ROLE_AdminSysteme')",
- *           "security_message"="Vous n'avez pas access à cette Ressource"
+ *           "security_message"="Vous n'avez pas access à cette Ressource",
  *         },
  *      collectionOperations={"get", "post"},
  *      itemOperations={"get","put","delete"},
@@ -35,14 +35,14 @@ class Profils
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"profil:read","user:read"})
+     * @Groups({"profil:read","user:read","user:write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=40)
      * @Assert\NotBlank( message="le libelle est obligatoire" )
-     * @Groups({"profil:read","user:read","profil:write","compte:write"})
+     * @Groups({"profil:read","user:read","user:write","profil:write","compte:write","compte:read"})
      */
     private $libelle;
 
