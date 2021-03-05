@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -44,6 +45,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *                "Recharge_Compte"={
  *                    "path"="/adminsysteme/compte/{id}",
  *                    "method"="PUT",
+ *                     "deserialize"=false,
  *                    "security"="(is_granted('ROLE_AdminSysteme')|| is_granted('ROLE_Caissier'))",
  *                    "security_message"="Vous n'avez pas access à cette Ressource",
  *
@@ -57,6 +59,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *        },
  *         normalizationContext={"groups"={"compte:read"}},
  *         denormalizationContext={"groups"={"compte:write"}}
+ * )
+ * @UniqueEntity(
+ * fields={"code"},
+ * message="Le code doit être unique"
  * )
  * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=CompteRepository::class)
@@ -96,12 +102,6 @@ class Compte
     private $archivage = 0;
 
     /**
-     * @ORM\OneToOne(targetEntity=Agence::class, cascade={"persist", "remove"})
-     * @Groups({"compte:read","compte:write"})
-     */
-    private $agences;
-
-    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comptes", cascade={"persist"})
      * @Groups({"compte:read","compte:write"})
      */
@@ -111,6 +111,12 @@ class Compte
      * @ORM\OneToMany(targetEntity=Transactions::class, mappedBy="comptes")
      */
     private $transactions;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Agence::class, mappedBy="compte", cascade={"persist", "remove"})
+     */
+    private $agence;
+
 
     public function __construct()
     {
@@ -170,17 +176,7 @@ class Compte
         return $this;
     }
 
-    public function getAgences(): ?Agence
-    {
-        return $this->agences;
-    }
 
-    public function setAgences(?Agence $agences): self
-    {
-        $this->agences = $agences;
-
-        return $this;
-    }
 
     public function getUsers(): ?User
     {
@@ -223,4 +219,22 @@ class Compte
 
         return $this;
     }
+
+    public function getAgence(): ?Agence
+    {
+        return $this->agence;
+    }
+
+    public function setAgence(Agence $agence): self
+    {
+        // set the owning side of the relation if necessary
+        if ($agence->getCompte() !== $this) {
+            $agence->setCompte($this);
+        }
+
+        $this->agence = $agence;
+
+        return $this;
+    }
+
 }

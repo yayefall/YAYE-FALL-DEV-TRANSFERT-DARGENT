@@ -130,9 +130,9 @@ class UserController extends AbstractController
      *     methods={"put"},
      *     name="Edit-user",
      *     defaults={
-     *          "__controller"="App\Controller\UserController::updateCaissier",
-     *          "__api_resource_class"=User::class,
-     *          "__api_item_operation_name"="put-caissier",
+     *          "_controller"="App\Controller\UserController::updateCaissier",
+     *          "_api_resource_class"=User::class,
+     *          "_api_item_operation_name"="put-caissier",
      *     }
      * )
      *
@@ -157,16 +157,15 @@ class UserController extends AbstractController
 
 
 
-
     /**
      * Route(
      *    path="/api/adminagence/useragence",
      *     methods={"POST"},
      *     name="user_agence",
      *     defaults={
-     *          "__controller"="App\Controller\UserController::addAgence",
-     *          "__api_resource_class"=User::class,
-     *          "__api_collection_operation_name"="post_agence",
+     *          "_controller"="App\Controller\UserController::addAgence",
+     *          "_api_resource_class"=User::class,
+     *          "_api_collection_operation_name"="post_agence",
      *     }
      *
      *
@@ -177,7 +176,7 @@ class UserController extends AbstractController
 
     public function addAgence(Request $request): ?JsonResponse
     {
-        dd('kkkkkkkkkkkkkkkkkkkk');
+      //  dd('kkkkkkkkkkkkkkkkkkkk');
         if ($this->security->getUser()->getProfil()->getLibelle() === 'AdminAgence'){
 
             return $this->addUser->addUser($request, 'UserAgence');

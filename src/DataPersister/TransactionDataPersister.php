@@ -9,6 +9,8 @@ use App\Entity\Transactions;
 use App\Repository\TransactionsRepository;
 use App\Services\ServiceTransaction;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 
 
@@ -19,17 +21,20 @@ class TransactionDataPersister implements DataPersisterInterface
     private $compteRepository;
     private $frais;
     private $transactionsRepository;
+    private $requestStack;
 
 
     public function __construct(EntityManagerInterface $entityManager,
                                 Security $security, ServiceTransaction $frais,
                                 CompteDataPersister $compteRepository,
-                                 TransactionsRepository $transactionsRepository){
+                                 TransactionsRepository $transactionsRepository,
+                                  RequestStack $requestStack){
         $this->entityManager=$entityManager;
         $this->security=$security;
         $this->compteRepository=$compteRepository;
         $this->frais=$frais;
         $this->transactionsRepository=$transactionsRepository;
+        $this->requestStack=$requestStack;
     }
 
     public function supports($data): bool
@@ -39,76 +44,52 @@ class TransactionDataPersister implements DataPersisterInterface
 
     public function persist($data,array $context = [])
     {
-      /* if ($context['collection_operation_name']=== 'Recharge-Compte') {
-            $compte = $data->getComptes();
 
-           $compte->setSold($compte->getSold() + $data->getMontant());
-          // dd($compte->setSold($compte->getSold() + $data->getMontant()));
-           $data->setCreatAt(new \DateTime('now'));
-           $data->setTypeTransaction('depot');
-           $data->setUsers($this->security->getUser());
+        if(isset($context['collection_operation_name'])){
 
-           $this->entityManager->persist($data);
-           $this->entityManager->persist($compte);
-           $this->entityManager->flush();
-       }*/
-       if ($context['collection_operation_name']=== 'Transfert-Client')
-       {
-          $frais= $this->frais->getFrais($data->getMontant());
+           $frais= $this->frais->getFrais($data->getMontant());
 
            $partEtat = ($frais * 40) / 100;
            $partEntreprise = ($frais * 30) / 100;
            $partAgentDepot = ($frais * 10) / 100;
            $partAgentRetrait = ($frais * 20) / 100;
 
-           if ($data->getTypeTransaction()==='depot')
-           {
-              // $client= $data->getClients();
-               $data->setPartEtat($partEtat);
 
+               $data->setPartEtat($partEtat);
                $data->setCode($this->frais->createCode());
-             //  $data->setClients($data->getClients());
-               $data->setCreatAt(new \DateTime('now'));
+               $data->setDateDepot(new \DateTime('now'));
                $data->setPartEntreprise($partEntreprise);
                $data->setPartAgentDepot($partAgentDepot);
                $data->setPartAgentRetrait($partAgentRetrait);
-               $data->setUsers($this->security->getUser());
-               //dd($data);
+               $user= $this->security->getUser();
+               $data->setUserDepot($user);
+               $compte= $user->getAgence()->getCompte();
+               $compte->setSolde($compte->getSolde()-$data->getMontant());
+               $data->setComptes($compte);
                $this->entityManager->persist($data);
-              // $this->entityManager->persist($client);
                $this->entityManager->flush();
 
-           }
-       }else{
-
-           if ($data->getTypeTransaction()==='retrait')
-           {
-              // dd($context);
-               $code= $data->getCode($this->frais->createCode());
-        // dd($code);
-               $tranSation= $this->transactionsRepository->findOneBy(['code'=>$code]);
-              //dd($tranSation);
-               $client= $tranSation->getClients();
-               $client->setCNIBeneficiaire($data->setClient()->getCNIBeneficiaire());
-               if ($code){
-                   $transations= new Transactions();
-                   $transations->setUsers($this->security->getUser());
-                   $transations->setCode($code);
-                   $transations->setMontant($tranSation->getMontant());
-                   $transations->setCreatAt($tranSation->getCreatAt());
-                   $transations->setTypeTransaction('retrait');
-                 //  dd($tranSation);
-                   $transations->setPartEntreprise($tranSation->getPartEntreprise());
-                   $transations->setPartAgentDepot($tranSation->getPartAgentDepot());
-                   $transations->setPartAgentRetrait($tranSation->getPartAgentRetrait());
-                   $transations->setPartEtat($tranSation->getPartEtat());
-                   $transations->setClients($tranSation->getClients());
-                   $transations->setCreatAt(new \DateTime('now'));
-                   $this->entityManager->persist($client);
-                   $this->entityManager->persist($transations);
+        }
+       if(isset($context['item_operation_name'])){
+           $code= json_decode($this->requestStack->getCurrentRequest()->getContent(),true);
+           $transaction= $this->transactionsRepository->findOneBy(['code'=>$code['code']]);
+           if ($transaction){
+               if ($data->getDateRetrait() ==null){
+                   $data->setDateRetrait(new \DateTime('now'));
+                   $data->setUserRetrait($this->security->getUser());
+                   $client= $data->getClients();
+                   $client->setCNIBeneficiaire($code['CNIBeneficiaire']);
+                   $user= $this->security->getUser();
+                   $compte= $user->getAgence()->getCompte();
+                   $compte->setSolde($compte->getSolde()+$data->getMontant());
+                   $this->entityManager->persist($data);
+                   $this->entityManager->flush();
                }
+
+           }else{
+               return new JsonResponse("le Code n'est pas conforme, Veuillez saisir le bon code ",500);
            }
-           $this->entityManager->flush();
+
        }
     }
 

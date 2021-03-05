@@ -7,6 +7,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\TransactionsRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -36,7 +37,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  *                "Transfert-Client"={
  *                      "method"="post",
- *                      "path"="/transactions/client",
+ *                      "path"="/transactions/client/depot",
  *                      "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence'))",
  *                      "security_message"="Vous n'avez pas access à cette Ressource",
  *                      "normalization_context"={"groups"={"trans:read"}},
@@ -47,7 +48,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      itemOperations={
  *              "Retrait-Client"={
  *                        "method"="put",
- *                        "path"="/transactions/client/{id}",
+ *                        "path"="/transactions/client/retrait/{id}",
  *                        "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence') )",
  *                        "security_message"="Vous n'avez pas access à cette Ressource",
  *                     },
@@ -70,6 +71,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  *         normalizationContext={"groups"={"trans:read"}},
  *         denormalizationContext={"groups"={"trans:write"}},
+ * )
+ * @UniqueEntity(
+ * fields={"code"},
+ * message="Le code doit être unique"
  * )
  * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=TransactionsRepository::class)
@@ -96,18 +101,6 @@ class Transactions
      * @Groups({"trans:read","trans:write"})
      */
     private $montant;
-
-    /**
-     * @ORM\Column(type="datetime")
-     * @Groups({"trans:read","trans:write"})
-     */
-    private $creatAt;
-
-    /**
-     * @ORM\Column(type="string", length=100)
-     * @Groups({"trans:read","trans:write"})
-     */
-    private $typeTransaction;
 
     /**
      * @ORM\Column(type="integer")
@@ -138,11 +131,6 @@ class Transactions
      */
     private $archivage = 0;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactions")
-     * @Groups({"trans:read","trans:write"})
-     */
-    private $users;
 
     /**
      * @ORM\OneToOne(targetEntity=Client::class, cascade={"persist", "remove"})
@@ -155,6 +143,32 @@ class Transactions
      * @Groups({"trans:read","trans:write"})
      */
     private $comptes;
+
+
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactionRetrait")
+     *  @Groups({"trans:read","trans:write"})
+     */
+    private $userRetrait;
+
+    /**
+     * @ORM\Column(type="date",nullable=true)
+     *  @Groups({"trans:read","trans:write"})
+     */
+    private $dateDepot;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     *  @Groups({"trans:read","trans:write"})
+     */
+    private $dateRetrait;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactionDepot")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $userDepot;
 
     public function getId(): ?int
     {
@@ -181,30 +195,6 @@ class Transactions
     public function setMontant(int $montant): self
     {
         $this->montant = $montant;
-
-        return $this;
-    }
-
-    public function getCreatAt(): ?\DateTimeInterface
-    {
-        return $this->creatAt;
-    }
-
-    public function setCreatAt(\DateTimeInterface $creatAt): self
-    {
-        $this->creatAt = $creatAt;
-
-        return $this;
-    }
-
-    public function getTypeTransaction(): ?string
-    {
-        return $this->typeTransaction;
-    }
-
-    public function setTypeTransaction(string $typeTransaction): self
-    {
-        $this->typeTransaction = $typeTransaction;
 
         return $this;
     }
@@ -269,18 +259,6 @@ class Transactions
         return $this;
     }
 
-    public function getUsers(): ?User
-    {
-        return $this->users;
-    }
-
-    public function setUsers(?User $users): self
-    {
-        $this->users = $users;
-
-        return $this;
-    }
-
     public function getClients(): ?Client
     {
         return $this->clients;
@@ -301,6 +279,55 @@ class Transactions
     public function setComptes(?Compte $comptes): self
     {
         $this->comptes = $comptes;
+
+        return $this;
+    }
+
+
+    public function getUserRetrait(): ?User
+    {
+        return $this->userRetrait;
+    }
+
+    public function setUserRetrait(?User $userRetrait): self
+    {
+        $this->userRetrait = $userRetrait;
+
+        return $this;
+    }
+
+    public function getDateDepot(): ?\DateTimeInterface
+    {
+        return $this->dateDepot;
+    }
+
+    public function setDateDepot(\DateTimeInterface $dateDepot): self
+    {
+        $this->dateDepot = $dateDepot;
+
+        return $this;
+    }
+
+    public function getDateRetrait(): ?\DateTimeInterface
+    {
+        return $this->dateRetrait;
+    }
+
+    public function setDateRetrait(?\DateTimeInterface $dateRetrait): self
+    {
+        $this->dateRetrait = $dateRetrait;
+
+        return $this;
+    }
+
+    public function getUserDepot(): ?User
+    {
+        return $this->userDepot;
+    }
+
+    public function setUserDepot(?User $userDepot): self
+    {
+        $this->userDepot = $userDepot;
 
         return $this;
     }

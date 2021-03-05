@@ -53,21 +53,14 @@ class CompteDataPersister implements DataPersisterInterface
 
     public function persist($data,array $context = [])
     {
-
         if ($context["item_operation_name"]=== "Recharge_Compte"){
-            $depot=  $data->getSolde();
-           // dd($depot);
-            // dd($this->requestStack->getCurrentRequest()->get('id'));
-            $idCompte= $this->requestStack->getCurrentRequest()->get('id');
-            $compte= $this->compteRepository->findOneBy(['id' => $idCompte]);
-            $compte->setSolde($compte->getSolde()+$depot);
-
-            $compte->setCreatAt(new \DateTime('now'));
-            //dd($data);
-            $this->entityManager->persist($compte);
+            $soldeCompte= json_decode($this->requestStack->getCurrentRequest()->getContent(),true);
+            $data->setSolde($data->getSolde()+$soldeCompte['solde']);
+            $data->setCreatAt(new \DateTime('now'));
+            $this->entityManager->persist($data);
             $this->entityManager->flush();
+            return new JsonResponse('success',500);
         }
-
 
         else{
          $data->setSolde(700000);
