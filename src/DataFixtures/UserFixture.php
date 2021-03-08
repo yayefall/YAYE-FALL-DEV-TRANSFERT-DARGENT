@@ -22,7 +22,10 @@ class UserFixture extends Fixture
     public function load(ObjectManager $manager)
     {
 
+
         $faker = Factory::create('fr_FR');
+
+
         for ($i = 0; $i < 4; $i++) {
 
             $user = new User();
@@ -35,6 +38,7 @@ class UserFixture extends Fixture
             $user ->setTelephone($faker->phoneNumber);
             $user ->setPhoto($faker->randomElement(['photo']));
             $user->setArchivage(0);
+           // $user->addAgence()
             $user ->setProfil($this->getReference(rand(0, 3)));
             $hash = $this->encoder->encodePassword($user, "password");
             $user ->setPassword($hash);

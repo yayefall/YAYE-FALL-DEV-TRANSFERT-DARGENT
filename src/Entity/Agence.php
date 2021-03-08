@@ -66,21 +66,24 @@ class Agence
      */
     private $archivage = 0;
 
+
+    /**
+     * @ORM\OneToOne(targetEntity=Compte::class, inversedBy="agence", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     *  * @Groups({"agence:read","agence:write"})
+     */
+    private $compte;
+
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="agence")
      */
     private $users;
 
-    /**
-     * @ORM\OneToOne(targetEntity=Compte::class, inversedBy="agence", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $compte;
-
     public function __construct()
     {
         $this->users = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -135,6 +138,19 @@ class Agence
         return $this;
     }
 
+
+    public function getCompte(): ?Compte
+    {
+        return $this->compte;
+    }
+
+    public function setCompte(Compte $compte): self
+    {
+        $this->compte = $compte;
+
+        return $this;
+    }
+
     /**
      * @return Collection|User[]
      */
@@ -161,18 +177,6 @@ class Agence
                 $user->setAgence(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getCompte(): ?Compte
-    {
-        return $this->compte;
-    }
-
-    public function setCompte(Compte $compte): self
-    {
-        $this->compte = $compte;
 
         return $this;
     }

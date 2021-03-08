@@ -27,59 +27,66 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *            "Add-user"={
  *                  "method"="POST",
  *                  "path"="/adminsysteme/caissier",
- *                   "route_name"="addCaissier",
+ *                  "security"="(is_granted('ROLE_AdminSysteme'))",
+ *                  "security_message"="Vous n'avez pas access à cette Ressource",
  *
  *                  },
- *                 "post_agence"= {
- *                      "method"= "POST",
- *                      "path"="/adminagence/useragence",
- *                     " route_name"="user_agence",
+ *                 "post_agence"={
+ *                     "method"= "POST",
+ *                     "path"="/adminagence/useragence",
+ *                     "security"="(is_granted('ROLE_AdminAgence'))",
+ *                     "security_message"="Vous n'avez pas access à cette Ressource",
+ *
  *                   },
- *
- *
- *            "Get-user-caissier"={
- *                 "method"="get",
- *                  "path"="/adminsysteme/caissier",
- *
- *               },
- *         "Get-user-agence"={
- *                 "method"="get",
- *                 "path"="/adminagence/useragence",
- *
- *               },
- *        "Get-users"={
+ *        "Get-caissier"={
  *                 "method"="get",
  *                 "path"="/adminsysteme/users",
+ *                 "security"="(is_granted('ROLE_AdminSysteme'))",
+ *                 "security_message"="Vous n'avez pas access à cette Ressource",
+ *         },
+ *      "Get-caissier"={
+ *                 "method"="get",
+ *                 "path"="/adminagence/users",
+ *                 "security"="(is_granted('ROLE_AdminAgence'))",
+ *                 "security_message"="Vous n'avez pas access à cette Ressource",
+ *
+ *               },
+ *     "Get-users"={
+ *                 "method"="get",
+ *                 "path"="/adminagence/useragence",
+ *                 "security"="(is_granted('ROLE_AdminAgence'))",
+ *                 "security_message"="Vous n'avez pas access à cette Ressource",
  *
  *               },
  *         },
  *       itemOperations={
  *               "bloquer-userAgence"={
- *                       "method"="delete",
- *                       "path"="/adminagence/useragence/{id}",
- *
- *                     },
- *               "bloquer-caissier"={
- *                        "method"="delete",
- *                        "path"="/adminsysteme/caisier/{id}",
+ *                      "method"="delete",
+ *                      "path"="/adminsysteme/caissier/{id}",
+ *                      "security"="(is_granted('ROLE_AdminSysteme'))",
+ *                      "security_message"="Vous n'avez pas access à cette Ressource",
  *
  *                     },
  *                "get-users"={
  *                      "method"="get",
  *                      "path"="/adminsysteme/users/{id}",
+ *                      "security"="(is_granted('ROLE_AdminSysteme'))",
+ *                      "security_message"="Vous n'avez pas access à cette Ressource",
  *
  *                     },
  *                "put-caissier"={
  *                        "method"="put",
  *                        "path"="/adminsysteme/caissier/{id}",
- *                        "route_name"="Edit-user",
- *
+ *                        "security"="(is_granted('ROLE_AdminSysteme'))",
+ *                        "security_message"="Vous n'avez pas access à cette Ressource",
  *                   },
- *                 "put-useragence"={
- *                       "method"="put",
- *                       "path"="/adminagence/useragence/{id}",
- *
+ *                "put-useragence"={
+ *                        "method"="put",
+ *                        "path"="/adminagence/useragence/{id}",
+ *                        "security"="(is_granted('ROLE_AdminAgence'))",
+ *                        "security_message"="Vous n'avez pas access à cette Ressource",
  *                   },
+ *
  *            },
  *         normalizationContext={"groups"={"user:read"}},
  *         denormalizationContext={"groups"={"user:write"}}
@@ -114,6 +121,8 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups({"user:write"})
+     *
      */
     private $password;
 
@@ -148,7 +157,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="blob",nullable=true)
-     * @Groups({"user:write","profil:write","compte:write","compte:read","agence:write","trans:write"})
+     *
      */
     private $photo;
 
@@ -167,33 +176,33 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Compte::class, mappedBy="users")
-     *  @Groups({"user:read","user:write","trans:write"})
+     *
      */
     private $comptes;
 
 
     /**
      * @ORM\OneToMany(targetEntity=Transactions::class, mappedBy="userRetrait")
-     * @Groups({"user:read","user:write","trans:write"})
+     *
      */
     private $transactionRetrait;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="users")
-     * @Groups({"user:read","user:write","trans:write"})
-     */
-    private $agence;
-
-    /**
      * @ORM\OneToMany(targetEntity=Transactions::class, mappedBy="userDepot")
+     *
      */
     private $transactionDepot;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="users")
+     *  @Groups({"user:read","user:write","trans:write"})
+     */
+    private $agence;
 
 
     public function __construct()
     {
         $this->comptes = new ArrayCollection();
-        $this->agence = new ArrayCollection();
         $this->transactionRetrait = new ArrayCollection();
         $this->transactionDepot = new ArrayCollection();
     }
@@ -430,17 +439,6 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getAgence(): ?Agence
-    {
-        return $this->agence;
-    }
-
-    public function setAgence(?Agence $agence): self
-    {
-        $this->agence = $agence;
-
-        return $this;
-    }
 
     /**
      * @return Collection|Transactions[]
@@ -468,6 +466,18 @@ class User implements UserInterface
                 $transactionDepot->setUserDepot(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAgence(): ?Agence
+    {
+        return $this->agence;
+    }
+
+    public function setAgence(?Agence $agence): self
+    {
+        $this->agence = $agence;
 
         return $this;
     }

@@ -46,7 +46,7 @@ class TransactionDataPersister implements DataPersisterInterface
     {
 
         if(isset($context['collection_operation_name'])){
-
+           // dd($context);
            $frais= $this->frais->getFrais($data->getMontant());
 
            $partEtat = ($frais * 40) / 100;
@@ -64,8 +64,10 @@ class TransactionDataPersister implements DataPersisterInterface
                $user= $this->security->getUser();
                $data->setUserDepot($user);
                $compte= $user->getAgence()->getCompte();
+             //  dd($compte);
                $compte->setSolde($compte->getSolde()-$data->getMontant());
                $data->setComptes($compte);
+               //dd($data);
                $this->entityManager->persist($data);
                $this->entityManager->flush();
 

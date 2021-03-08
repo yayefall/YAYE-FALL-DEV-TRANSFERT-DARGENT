@@ -10,6 +10,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ApiResource(
@@ -76,6 +77,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * fields={"code"},
  * message="Le code doit être unique"
  * )
+ * @ApiFilter(SearchFilter::class, properties={"dateRetrait"})
  * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=TransactionsRepository::class)
  */
@@ -122,7 +124,7 @@ class Transactions
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"trans:read","trans:write","user:write"})
+     * @Groups({"trans:read","trans:write"})
      */
     private $partAgentDepot;
 
@@ -143,7 +145,6 @@ class Transactions
      * @Groups({"trans:read","trans:write"})
      */
     private $comptes;
-
 
 
     /**

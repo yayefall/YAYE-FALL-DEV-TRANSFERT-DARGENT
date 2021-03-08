@@ -73,26 +73,26 @@ class Compte
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"compte:read","compte:write","client:write"})
+     * @Groups({"compte:read","compte:write","user:write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"compte:read","compte:write"})
+     * @Groups({"compte:read","compte:write","user:write"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank( message="le montant est obligatoire" )
-     * @Groups({"compte:read","compte:write"})
+     * @Groups({"compte:read","compte:write","user:write"})
      */
     private $solde;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"compte:read","compte:write"})
+     * @Groups({"compte:read","compte:write","user:write"})
      */
     private $creatAt;
 

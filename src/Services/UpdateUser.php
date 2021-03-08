@@ -61,7 +61,7 @@ class UpdateUser{
     }
 
 
-    public function editUser( Request $request,int $id): Response
+   /* public function editUser( Request $request,int $id): Response
     {
 
         $photo = $request->files->get("photo");
@@ -100,7 +100,7 @@ class UpdateUser{
         return new JsonResponse($message,Response::HTTP_OK);
 
 
-    }
+    }*/
 
 
 }

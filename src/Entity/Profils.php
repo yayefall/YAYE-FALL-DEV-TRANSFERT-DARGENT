@@ -48,7 +48,6 @@ class Profils
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"profil:read"})
      */
     private $archivage = 0;
 

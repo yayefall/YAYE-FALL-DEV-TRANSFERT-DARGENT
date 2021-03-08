@@ -108,7 +108,7 @@ class UserController extends AbstractController
  * @return JsonResponse
  */
 
-    public function addCaissier(Request $request): JsonResponse
+   /* public function addCaissier(Request $request): JsonResponse
     {
   //dd($this->security->getUser()->getProfil()->getLibelle() );
         if ($this->security->getUser()->getProfil()->getLibelle() === 'AdminSysteme'){
@@ -119,7 +119,7 @@ class UserController extends AbstractController
             seuls les AdminSystemes sont autorises");
         }
 
-    }
+    }*/
 
 
 
@@ -128,7 +128,6 @@ class UserController extends AbstractController
      * @Route(
      *     path="/api/adminsysteme/caissier/{id}",
      *     methods={"put"},
-     *     name="Edit-user",
      *     defaults={
      *          "_controller"="App\Controller\UserController::updateCaissier",
      *          "_api_resource_class"=User::class,
@@ -141,7 +140,7 @@ class UserController extends AbstractController
      * @return Response
      */
 
-    public function updateCaissier(Request $request,int $id): Response
+  /*  public function updateCaissier(Request $request,int $id): Response
     {
         $user= $this->userRepository->findOneBy(['id'=>$id]);
         if ($this->security->getUser()->getProfil()->getLibelle() === 'AdminSysteme'
@@ -153,7 +152,7 @@ class UserController extends AbstractController
             return new JsonResponse("Vous n'avez pas acces a cette rssourece,
                                               seuls les AdminAgences sont autoriseszzzzzzzzzz");
         }
-    }
+    }*/
 
 
 
@@ -174,7 +173,7 @@ class UserController extends AbstractController
      * @return JsonResponse|null
      */
 
-    public function addAgence(Request $request): ?JsonResponse
+   /* public function addAgence(Request $request): ?JsonResponse
     {
       //  dd('kkkkkkkkkkkkkkkkkkkk');
         if ($this->security->getUser()->getProfil()->getLibelle() === 'AdminAgence'){
@@ -185,7 +184,7 @@ class UserController extends AbstractController
             return new JsonResponse("Vous n'avez pas acces a cette fonctionalité,
                                            seuls les AdminAgences sont autoriseseeeeeeeeeeeeeee");
         }
-    }
+    }*/
 
 
     /**
@@ -195,12 +194,13 @@ class UserController extends AbstractController
      * )
      *
      * @param Request $request
-     * @param int $id
-     * @return Response
+     * @param EntityManagerInterface $manager
+     * @return JsonResponse
+     * @throws ExceptionInterface
      */
 
 
-    public function editUserAgence(Request $request,int $id): Response
+  /*  public function editUserAgence(Request $request,int $id): Response
     {
         $user= $this->userRepository->findOneBy(['id'=>$id]);
         if ($this->security->getUser()->getProfil()->getLibelle() === 'AdminSysteme'
@@ -212,10 +212,13 @@ class UserController extends AbstractController
             return new JsonResponse("Vous n'avez pas acces a cette rssourece,
                                           seuls les AdminSystemes sont autorises");
         }
-    }
+    }*/
 
 
-   /* public function addUsers(Request $request,EntityManagerInterface $manager): JsonResponse
+
+    // c'est la partie de la'ajout users
+
+  /*  public function addUsers(Request $request,EntityManagerInterface $manager): JsonResponse
     {
         $users = $request->request->all();
 
@@ -260,10 +263,10 @@ class UserController extends AbstractController
 
 
 
+// c'est la partie de modification
 
 
-
-  /*  public function updateUser(EntityManagerInterface $entityManager, int $id, Request $request): Response
+   /* public function updateUser(EntityManagerInterface $entityManager, int $id, Request $request): Response
     {
         $user = $entityManager->getRepository(User::class)->find($id);
         // dd($user);

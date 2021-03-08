@@ -60,7 +60,7 @@ class AddUser {
 
 
 
-    public function addUser(Request $request, $Profile): ?JsonResponse
+  /*  public function addUser(Request $request, $Profile): ?JsonResponse
     {
         $users = $request->request->all();
         $photo = $request->files->get('photo');
@@ -84,7 +84,7 @@ class AddUser {
             return new JsonResponse("succefull", 200);
 
 
-    }
+    }*/
 
 
 }

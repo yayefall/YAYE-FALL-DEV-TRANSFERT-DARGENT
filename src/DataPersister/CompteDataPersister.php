@@ -53,17 +53,20 @@ class CompteDataPersister implements DataPersisterInterface
 
     public function persist($data,array $context = [])
     {
-        if ($context["item_operation_name"]=== "Recharge_Compte"){
-            $soldeCompte= json_decode($this->requestStack->getCurrentRequest()->getContent(),true);
-            $data->setSolde($data->getSolde()+$soldeCompte['solde']);
+
+        if (isset($context["item_operation_name"])) {
+
+
+            $soldeCompte = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
+            $data->setSolde($data->getSolde() + $soldeCompte['solde']);
             $data->setCreatAt(new \DateTime('now'));
             $this->entityManager->persist($data);
             $this->entityManager->flush();
-            return new JsonResponse('success',500);
-        }
+            return new JsonResponse('success', 500);
 
+        }
         else{
-         $data->setSolde(700000);
+
         if ($data->getSolde() < 700000){
             return new JsonResponse('le Compte doit etre initialisé au moins 700000 FCFA',500);
         }
@@ -77,8 +80,8 @@ class CompteDataPersister implements DataPersisterInterface
 
        }
 
-    }
 
+}
     public function remove($data,array $context = [])
     {
         $data->setArchivage(1);
