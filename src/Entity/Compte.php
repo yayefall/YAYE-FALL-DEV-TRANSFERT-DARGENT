@@ -22,9 +22,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         },
  *      collectionOperations={
  *        "get-Compte-admin"={
- *             "path"="/adminsysteme/compte",
+ *             "path"="/adminagence/compte",
  *             "method"="get",
- *             "security"="(is_granted('ROLE_AdminSysteme') or is_granted('ROLE_Caissier'))",
+ *              "route_name"="comptes",
+ *             "security"="(is_granted('ROLE_AdminAgence') or is_granted('ROLE_UserAgence'))",
  *             "security_message"="Vous n'avez pas access à cette Ressource",
  *         },
  *        "Post_Compte"={
@@ -34,12 +35,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  *             "security_message"="Vous n'avez pas access à cette Ressource",
  *            },
  *       },
+ *
  *      itemOperations={
  *              "get-Compte"={
- *                  "path"="/adminsysteme/compte/{id}",
- *                  "method"="get",
- *                  "security"="(is_granted('ROLE_AdminSysteme'))",
+ *                  "path"="/adminagence/compte/{id}",
+ *                  "method"="GET",
+ *                  "security"="(is_granted('ROLE_AdminAgence'))",
  *                  "security_message"="Vous n'avez pas access à cette Ressource",
+ *
  *
  *                   },
  *                "Recharge_Compte"={
@@ -52,7 +55,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *                 },
  *               "delete-Compte"={
  *                      "path"="/adminsysteme/compte/{id}",
- *                      "method"="delete",
+ *                      "method"="DELETE",
  *                      "security"="(is_granted('ROLE_AdminSysteme'))",
  *                      "security_message"="Vous n'avez pas access à cette Ressource",
  *                  },

@@ -35,7 +35,14 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *                          "security"="(is_granted('ROLE_UserAgence') || is_granted('ROLE_AdminAgence'))",
  *                          "security_message"="Vous n'avez pas access à cette Ressource",
  *                      },
- *
+ * "          Retrait-Client"={
+ *                        "method"="post",
+ *                        "path"="/transactions/client/retrait",
+ *                        "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence') )",
+ *                        "security_message"="Vous n'avez pas access à cette Ressource",
+ *                       "normalization_context"={"groups"={"transac:read"}},
+ *                       "denormalization_context"={"groups"={"transac:write"}},
+ *                     },
  *                "Transfert-Client"={
  *                      "method"="post",
  *                      "path"="/transactions/client/depot",
@@ -47,12 +54,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *
  *         },
  *      itemOperations={
- *              "Retrait-Client"={
- *                        "method"="put",
- *                        "path"="/transactions/client/retrait/{id}",
- *                        "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence') )",
- *                        "security_message"="Vous n'avez pas access à cette Ressource",
- *                     },
+ *
  *              "GET-transaction-for-UserAgence"={
  *                          "method"="get",
  *                            "defaults"={"id"=null},
@@ -73,10 +75,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *         normalizationContext={"groups"={"trans:read"}},
  *         denormalizationContext={"groups"={"trans:write"}},
  * )
- * @UniqueEntity(
- * fields={"code"},
- * message="Le code doit être unique"
- * )
+ *
  * @ApiFilter(SearchFilter::class, properties={"dateRetrait"})
  * @ApiFilter(BooleanFilter::class, properties={"archivage"})
  * @ORM\Entity(repositoryClass=TransactionsRepository::class)
@@ -93,14 +92,13 @@ class Transactions
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"trans:read","trans:write"})
+     * @Groups({"trans:read","trans:write","transac:write"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank( message="le montant est obligatoire" )
-     * @Groups({"trans:read","trans:write"})
+     * @Groups({"trans:read","trans:write","client"})
      */
     private $montant;
 
@@ -133,10 +131,9 @@ class Transactions
      */
     private $archivage = 0;
 
-
     /**
      * @ORM\OneToOne(targetEntity=Client::class, cascade={"persist", "remove"})
-     * @Groups({"trans:read","trans:write"})
+     * @Groups({"trans:read","trans:write","client"})
      */
     private $clients;
 
@@ -155,7 +152,7 @@ class Transactions
 
     /**
      * @ORM\Column(type="date",nullable=true)
-     *  @Groups({"trans:read","trans:write"})
+     *  @Groups({"trans:read","trans:write","client"})
      */
     private $dateDepot;
 

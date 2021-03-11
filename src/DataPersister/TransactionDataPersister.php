@@ -9,7 +9,6 @@ use App\Entity\Transactions;
 use App\Repository\TransactionsRepository;
 use App\Services\ServiceTransaction;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 
@@ -18,20 +17,17 @@ class TransactionDataPersister implements DataPersisterInterface
 {
     Private $entityManager;
     private $security;
-    private $compteRepository;
     private $frais;
     private $transactionsRepository;
     private $requestStack;
 
 
     public function __construct(EntityManagerInterface $entityManager,
-                                Security $security, ServiceTransaction $frais,
-                                CompteDataPersister $compteRepository,
+                                 Security $security, ServiceTransaction $frais,
                                  TransactionsRepository $transactionsRepository,
                                   RequestStack $requestStack){
         $this->entityManager=$entityManager;
         $this->security=$security;
-        $this->compteRepository=$compteRepository;
         $this->frais=$frais;
         $this->transactionsRepository=$transactionsRepository;
         $this->requestStack=$requestStack;
@@ -72,7 +68,8 @@ class TransactionDataPersister implements DataPersisterInterface
                $this->entityManager->flush();
 
         }
-       if(isset($context['item_operation_name'])){
+      /* if(isset($context['colleclion_operation_name'])){
+         //  dd($context);
            $code= json_decode($this->requestStack->getCurrentRequest()->getContent(),true);
            $transaction= $this->transactionsRepository->findOneBy(['code'=>$code['code']]);
            if ($transaction){
@@ -92,7 +89,7 @@ class TransactionDataPersister implements DataPersisterInterface
                return new JsonResponse("le Code n'est pas conforme, Veuillez saisir le bon code ",500);
            }
 
-       }
+       }*/
     }
 
     public function remove($data,array $context = [])

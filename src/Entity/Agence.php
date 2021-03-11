@@ -70,7 +70,7 @@ class Agence
     /**
      * @ORM\OneToOne(targetEntity=Compte::class, inversedBy="agence", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
-     *  * @Groups({"agence:read","agence:write"})
+     * @Groups({"agence:read","agence:write"})
      */
     private $compte;
 
