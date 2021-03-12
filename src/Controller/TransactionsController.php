@@ -43,6 +43,7 @@ class TransactionsController extends AbstractController
     public function putTrans(): Response
     {
         $code= json_decode($this->requestStack->getCurrentRequest()->getContent(),true);
+       // dd($code);
         $transaction= $this->transactionsRepository->findOneBy(['code'=>$code['code']]);
        // dd($transaction);
         if ($transaction){
@@ -50,7 +51,7 @@ class TransactionsController extends AbstractController
                 $transaction->setDateRetrait(new \DateTime('now'));
                 $transaction->setUserRetrait($this->security->getUser());
                 $client= $transaction->getClients();
-                //dd($client);
+               // dd($client);
                 $client->setCNIBeneficiaire($code['CNIBeneficiaire']);
                 $user= $this->security->getUser();
                 $compte= $user->getAgence()->getCompte();
@@ -68,7 +69,7 @@ class TransactionsController extends AbstractController
 
     /**
      * @Route("/api/transactions/client",
-     * methods={"GET"}
+     * methods={"POST"}
      *     )
      *
      * @param Request $request
@@ -87,7 +88,7 @@ class TransactionsController extends AbstractController
 
             }
         }
-        return $this->json('Transaction deja retirée');
+        return $this->json('Ce code nexiste pas' );
     }
 
 
