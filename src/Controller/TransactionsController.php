@@ -98,7 +98,7 @@ class TransactionsController extends AbstractController
 
     /**
      * @Route("/api/transactions/annuler",
-     * methods={"DELETE"}
+     * methods={"POST"}
      *     )
      *
      * @param Request $request
