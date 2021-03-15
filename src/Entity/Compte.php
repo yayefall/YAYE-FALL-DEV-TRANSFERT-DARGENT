@@ -120,10 +120,17 @@ class Compte
      */
     private $agence;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BlocTransaction::class, mappedBy="comptes")
+     */
+    private $blocTransactions;
+
 
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
+        $this->blocTransactions = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -178,7 +185,6 @@ class Compte
 
         return $this;
     }
-
 
 
     public function getUsers(): ?User
@@ -236,6 +242,36 @@ class Compte
         }
 
         $this->agence = $agence;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|BlocTransaction[]
+     */
+    public function getBlocTransactions(): Collection
+    {
+        return $this->blocTransactions;
+    }
+
+    public function addBlocTransaction(BlocTransaction $blocTransaction): self
+    {
+        if (!$this->blocTransactions->contains($blocTransaction)) {
+            $this->blocTransactions[] = $blocTransaction;
+            $blocTransaction->setComptes($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBlocTransaction(BlocTransaction $blocTransaction): self
+    {
+        if ($this->blocTransactions->removeElement($blocTransaction)) {
+            // set the owning side to null (unless already changed)
+            if ($blocTransaction->getComptes() === $this) {
+                $blocTransaction->setComptes(null);
+            }
+        }
 
         return $this;
     }

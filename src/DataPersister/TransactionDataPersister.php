@@ -9,6 +9,7 @@ use App\Entity\Transactions;
 use App\Repository\TransactionsRepository;
 use App\Services\ServiceTransaction;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 
@@ -68,28 +69,8 @@ class TransactionDataPersister implements DataPersisterInterface
                $this->entityManager->flush();
 
         }
-      /* if(isset($context['colleclion_operation_name'])){
-         //  dd($context);
-           $code= json_decode($this->requestStack->getCurrentRequest()->getContent(),true);
-           $transaction= $this->transactionsRepository->findOneBy(['code'=>$code['code']]);
-           if ($transaction){
-               if ($data->getDateRetrait() ==null){
-                   $data->setDateRetrait(new \DateTime('now'));
-                   $data->setUserRetrait($this->security->getUser());
-                   $client= $data->getClients();
-                   $client->setCNIBeneficiaire($code['CNIBeneficiaire']);
-                   $user= $this->security->getUser();
-                   $compte= $user->getAgence()->getCompte();
-                   $compte->setSolde($compte->getSolde()+$data->getMontant());
-                   $this->entityManager->persist($data);
-                   $this->entityManager->flush();
-               }
+            return  ($data);
 
-           }else{
-               return new JsonResponse("le Code n'est pas conforme, Veuillez saisir le bon code ",500);
-           }
-
-       }*/
     }
 
     public function remove($data,array $context = [])

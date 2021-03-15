@@ -199,12 +199,25 @@ class User implements UserInterface
      */
     private $agence;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BlocTransaction::class, mappedBy="userDepot")
+     */
+    private $blockTransactionDepot;
+
+    /**
+     * @ORM\OneToMany(targetEntity=BlocTransaction::class, mappedBy="userRetrait")
+     */
+    private $blockTransactionRetrait;
+
 
     public function __construct()
     {
         $this->comptes = new ArrayCollection();
         $this->transactionRetrait = new ArrayCollection();
         $this->transactionDepot = new ArrayCollection();
+        $this->blockTransactionDepot = new ArrayCollection();
+        $this->blockTransactionRetrait = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -481,6 +494,67 @@ class User implements UserInterface
 
         return $this;
     }
+
+    /**
+     * @return Collection|BlocTransaction[]
+     */
+    public function getBlockTransactionDepot(): Collection
+    {
+        return $this->blockTransactionDepot;
+    }
+
+    public function addBlockTransactionDepot(BlocTransaction $blockTransactionDepot): self
+    {
+        if (!$this->blockTransactionDepot->contains($blockTransactionDepot)) {
+            $this->blockTransactionDepot[] = $blockTransactionDepot;
+            $blockTransactionDepot->setUserDepot($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBlockTransactionDepot(BlocTransaction $blockTransactionDepot): self
+    {
+        if ($this->blockTransactionDepot->removeElement($blockTransactionDepot)) {
+            // set the owning side to null (unless already changed)
+            if ($blockTransactionDepot->getUserDepot() === $this) {
+                $blockTransactionDepot->setUserDepot(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|BlocTransaction[]
+     */
+    public function getBlockTransactionRetrait(): Collection
+    {
+        return $this->blockTransactionRetrait;
+    }
+
+    public function addBlockTransactionRetrait(BlocTransaction $blockTransactionRetrait): self
+    {
+        if (!$this->blockTransactionRetrait->contains($blockTransactionRetrait)) {
+            $this->blockTransactionRetrait[] = $blockTransactionRetrait;
+            $blockTransactionRetrait->setUserRetrait($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBlockTransactionRetrait(BlocTransaction $blockTransactionRetrait): self
+    {
+        if ($this->blockTransactionRetrait->removeElement($blockTransactionRetrait)) {
+            // set the owning side to null (unless already changed)
+            if ($blockTransactionRetrait->getUserRetrait() === $this) {
+                $blockTransactionRetrait->setUserRetrait(null);
+            }
+        }
+
+        return $this;
+    }
+
 
 
 }

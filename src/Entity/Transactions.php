@@ -26,7 +26,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *                       "path"="/transactions/compte",
  *                       "security"="(is_granted('ROLE_AdminSysteme')|| is_granted('ROLE_Caissier'))",
  *                       "security_message"="Vous n'avez pas access à cette Ressource",
- *                       "normalization_context"={"groups"={"trans:read"}},
+ *                       "normalization_context"={"groups"={"transaction:read"}},
  *                       "denormalization_context"={"groups"={"trans:write"}},
  *                    },
  *               "GET-transaction"={
@@ -68,8 +68,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *                         "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence') )",
  *                         "security_message"="Vous n'avez pas access à cette Ressource",
  *                     },
- *
- *
  *        },
  *
  *         normalizationContext={"groups"={"trans:read"}},
@@ -92,13 +90,13 @@ class Transactions
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"trans:read","trans:write","transac:write"})
+     * @Groups({"trans:read","trans:write","transaction:read"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"trans:read","trans:write","client"})
+     * @Groups({"trans:read","trans:write","client","transaction:read"})
      */
     private $montant;
 
@@ -146,13 +144,13 @@ class Transactions
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactionRetrait")
-     *  @Groups({"trans:read","trans:write"})
+     *  @Groups({"trans:read","trans:write","transaction:read"})
      */
     private $userRetrait;
 
     /**
      * @ORM\Column(type="date",nullable=true)
-     *  @Groups({"trans:read","trans:write","client"})
+     *  @Groups({"trans:read","trans:write","client","transaction:read"})
      */
     private $dateDepot;
 
@@ -165,6 +163,7 @@ class Transactions
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactionDepot")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"trans:read","trans:write"})
      */
     private $userDepot;
 
