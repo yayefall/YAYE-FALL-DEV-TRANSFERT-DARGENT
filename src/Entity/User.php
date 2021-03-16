@@ -34,7 +34,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *                 "post_agence"={
  *                     "method"= "POST",
  *                     "path"="/adminagence/useragence",
- *                     "security"="(is_granted('ROLE_AdminAgence'))",
+ *                     "security"="(is_granted('ROLE_AdminSysteme'))",
  *                     "security_message"="Vous n'avez pas access à cette Ressource",
  *
  *                   },
@@ -129,14 +129,14 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le name est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write","trans:read"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le prenom est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write","trans:read"})
      */
     protected $prenom;
 
@@ -170,7 +170,7 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity=Profils::class, inversedBy="users")
      * @Assert\NotBlank( message="le profile est obligatoire" )
-     * @Groups({"user:read","user:write","compte:write","compte:read","agence:write","trans:write"})
+     * @Groups({"user:read","user:write","compte:write","compte:read","agence:write","trans:write","trans:read"})
      */
     private $profil;
 

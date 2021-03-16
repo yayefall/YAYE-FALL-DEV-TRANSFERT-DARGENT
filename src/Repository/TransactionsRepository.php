@@ -19,6 +19,35 @@ class TransactionsRepository extends ServiceEntityRepository
         parent::__construct($registry, Transactions::class);
     }
 
+    public function getCommis(int  $id)
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.comptes', 'c')
+            ->innerJoin('c.agence', 'a')
+                    ->andWhere('a.id = :value')
+                    ->setParameter('value' , $id)
+                    ->getQuery()
+                    ->getResult()
+                    ;
+    }
+
+    public function getTransactions(int  $id)
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.comptes', 'c')
+            ->innerJoin('c.agence', 'a')
+            ->andWhere('a.id = :value')
+            ->setParameter('value' , $id)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
+
+
+
+
     // /**
     //  * @return Transactions[] Returns an array of Transactions objects
     //  */

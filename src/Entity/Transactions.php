@@ -29,12 +29,24 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *                       "normalization_context"={"groups"={"transaction:read"}},
  *                       "denormalization_context"={"groups"={"trans:write"}},
  *                    },
- *               "GET-transaction"={
+ *               "GET-myTransaction"={
+ *                          "method"="get",
+ *                          "path"="/useragence/mesTransactions",
+ *                          "security"="(is_granted('ROLE_UserAgence') || is_granted('ROLE_AdminAgence'))",
+ *                          "security_message"="Vous n'avez pas access à cette Ressource",
+ *                          "normalization_context"={"groups"={"mesTrans:read"}},
+ *                          "denormalization_context"={"groups"={"mesTrans:write"}},
+ *                      },
+ *
+ *
+ *                 "GET-allTransaction"={
  *                          "method"="get",
  *                          "path"="/useragence/transactions",
  *                          "security"="(is_granted('ROLE_UserAgence') || is_granted('ROLE_AdminAgence'))",
  *                          "security_message"="Vous n'avez pas access à cette Ressource",
+ *
  *                      },
+ *
  * "          Retrait-Client"={
  *                        "method"="post",
  *                        "path"="/transactions/client/retrait",
@@ -51,6 +63,15 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *                      "normalization_context"={"groups"={"trans:read"}},
  *                      "denormalization_context"={"groups"={"trans:write"}},
  *                  },
+ *                  "getCommision"={
+ *                          "method"="get",
+ *                          "path"="/transactions/commission",
+ *                          "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence'))",
+ *                          "security_message"="Vous n'avez pas access à cette Ressource",
+ *                          "normalization_context"={"groups"={"commis:read"}},
+ *                          "denormalization_context"={"groups"={"commis:write"}},
+ *
+ *            },
  *
  *         },
  *      itemOperations={
@@ -96,7 +117,7 @@ class Transactions
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"trans:read","trans:write","client","transaction:read"})
+     * @Groups({"trans:read","trans:write","client","transaction:read","mesTrans:read"})
      */
     private $montant;
 
@@ -114,13 +135,13 @@ class Transactions
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"trans:read","trans:write"})
+     * @Groups({"trans:read","trans:write","commis:read","mesTrans:read"})
      */
     private $partAgentRetrait;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"trans:read","trans:write"})
+     * @Groups({"trans:read","trans:write","commis:read","mesTrans:read"})
      */
     private $partAgentDepot;
 
@@ -144,26 +165,26 @@ class Transactions
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactionRetrait")
-     *  @Groups({"trans:read","trans:write","transaction:read"})
+     *  @Groups({"trans:read","trans:write","transaction:read","mesTrans:read"})
      */
     private $userRetrait;
 
     /**
      * @ORM\Column(type="date",nullable=true)
-     *  @Groups({"trans:read","trans:write","client","transaction:read"})
+     *  @Groups({"trans:read","trans:write","client","transaction:read","commis:read","mesTrans:read"})
      */
     private $dateDepot;
 
     /**
      * @ORM\Column(type="date", nullable=true)
-     *  @Groups({"trans:read","trans:write"})
+     *  @Groups({"trans:read","trans:write","commis:read","mesTrans:read"})
      */
     private $dateRetrait;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactionDepot")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"trans:read","trans:write"})
+     * @Groups({"trans:read","trans:write","mesTrans:read"})
      */
     private $userDepot;
 

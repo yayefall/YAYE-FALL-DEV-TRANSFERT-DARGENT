@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Repository\TransactionsRepository;
 use App\Entity\BlocTransaction;
+use App\Services\ServiceTransaction;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
@@ -21,16 +22,19 @@ class TransactionsController extends AbstractController
     private $security;
     private $transactionsRepository;
     private $requestStack;
+    private $frais;
 
     public function __construct(EntityManagerInterface $entityManager,
                                 Security $security,
                                 TransactionsRepository $transactionsRepository,
-                                RequestStack $requestStack)
+                                RequestStack $requestStack,
+                                 ServiceTransaction $frais)
     {
         $this->entityManager=$entityManager;
         $this->security=$security;
         $this->transactionsRepository=$transactionsRepository;
         $this->requestStack=$requestStack;
+        $this->frais=$frais;
     }
 
 
@@ -109,7 +113,6 @@ class TransactionsController extends AbstractController
         {
 
             $code = json_decode($request->getContent(), true);
-          //  dd($code);
             $transaction= $this->transactionsRepository->findOneBy(['code'=>$code['code']]);
           //  dd($transaction);
             if ($transaction){
@@ -125,10 +128,6 @@ class TransactionsController extends AbstractController
                     $partDepot = $transaction->getPartAgentDepot();
                     $partRetrait = $transaction->getPartAgentRetrait();
                     $userDepot = $transaction->getUserDepot();
-               //     dd($transaction);
-                  //  $this->entityManager->remove($transaction);
-                   // dd( $this->entityManager->remove($transaction));
-                  //  $this->entityManager->flush();
 
                     $client = new Client();
                     $client->setNomClient($users->getNomClient());
@@ -138,9 +137,7 @@ class TransactionsController extends AbstractController
                     $client->setArchivage($users->getArchivage());
                     $client->setTelephoneBeneficiaire($users->getTelephoneBeneficiaire());
 
-
                     $bloctransaction = new BlocTransaction();
-
                     $bloctransaction->setClients($client);
                     $bloctransaction->setComptes($compte);
                     $bloctransaction->setDateDepot($dateDepot);
@@ -164,5 +161,44 @@ class TransactionsController extends AbstractController
 
 
 
+    /**
+     * @Route("/api/transactions/commission",
+     * methods={"GET"}
+     *     )
+     *
+     */
+
+    public function getCommission(): Response
+    {
+
+        $user= $this->security->getUser();
+        $agenceId = $user->getAgence()->getId();
+        $commission = $this->transactionsRepository->getCommis($agenceId);
+       // dd($commission);
+        return $this->json($commission, 200, [], ['groups'=> 'commis:read']);
+
+
     }
+
+
+
+    /**
+     * @Route("/api/transactions/mesTransactions",
+     * methods={"GET"}
+     *     )
+     *
+     */
+
+
+    public function getTransaction(){
+
+        $user= $this->security->getUser();
+        $agenceId = $user->getAgence()->getId();
+        $transaction = $this->transactionsRepository->getTransactions($agenceId);
+         dd($transaction);
+        return $this->json($transaction, 200, [], ['groups'=> 'mesTrans:read']);
+
+
+    }
+}
 

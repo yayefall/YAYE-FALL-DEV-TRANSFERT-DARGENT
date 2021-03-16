@@ -16,13 +16,15 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  * @ApiResource(
  *      routePrefix="/adminsysteme",
  *   attributes={
- *          "pagination_enabled"=true,
+ *           "pagination_enabled"=true,
  *           "pagination_items_per_page"=4,
  *           "security"="is_granted('ROLE_AdminSysteme')",
  *           "security_message"="Vous n'avez pas access à cette Ressource",
  *         },
+ *
  *      collectionOperations={"get", "post"},
  *      itemOperations={"get","put","delete"},
+ *
  *         normalizationContext={"groups"={"profil:read"}},
  *         denormalizationContext={"groups"={"profil:write"}}
  * )
@@ -42,7 +44,7 @@ class Profils
     /**
      * @ORM\Column(type="string", length=40)
      * @Assert\NotBlank( message="le libelle est obligatoire" )
-     * @Groups({"profil:read","user:read","user:write","profil:write","compte:write","compte:read"})
+     * @Groups({"profil:read","user:read","user:write","profil:write","compte:write","compte:read","trans:write"})
      */
     private $libelle;
 
