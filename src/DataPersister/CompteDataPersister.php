@@ -55,7 +55,6 @@ class CompteDataPersister implements DataPersisterInterface
 
         if (isset($context["item_operation_name"])) {
 
-
             $soldeCompte = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
             $data->setSolde($data->getSolde() + $soldeCompte['solde']);
             $data->setCreatAt(new \DateTime('now'));

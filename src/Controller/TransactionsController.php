@@ -37,6 +37,7 @@ class TransactionsController extends AbstractController
         $this->frais=$frais;
     }
 
+ // Fonction de Retrait de Transactions
 
     /**
      * @Route("/api/transactions/retrait_client",
@@ -61,6 +62,7 @@ class TransactionsController extends AbstractController
                 $client->setCNIBeneficiaire($code['CNIBeneficiaire']);
                 $user= $this->security->getUser();
                 $compte= $user->getAgence()->getCompte();
+                $transaction->setCompteRetrait($compte);
                 $compte->setSolde($compte->getSolde()+$transaction->getMontant());
               //  dd($transaction);
                 $this->entityManager->flush();
@@ -72,6 +74,7 @@ class TransactionsController extends AbstractController
         return  $this->json('retrait avec succes');
     }
 
+    // Fonction de Recuperations des clients
 
     /**
      * @Route("/api/transactions/client",
@@ -99,6 +102,8 @@ class TransactionsController extends AbstractController
         return $this->json('Ce code nexiste pas' );
     }
 
+
+// Fonction de l'annulations de Transactions
 
     /**
      * @Route("/api/transactions/annuler",
@@ -159,7 +164,7 @@ class TransactionsController extends AbstractController
             return $this->json('L\'annulation se fait avec success' );
         }
 
-
+    // Fonction  de Lister Mes Commissions
 
     /**
      * @Route("/api/transactions/commissDepot",
@@ -201,24 +206,93 @@ class TransactionsController extends AbstractController
 
     }
 
+    // Fonctions de Lister Mes Transactions
+    /**
+     * @Route("/api/transactions/mesTransDepot",
+     * methods={"GET"}
+     *     )
+     *
+     */
+
+    public function getTransactionD(): JsonResponse
+    {
+
+        $user= $this->security->getUser();
+        // dd($user);
+        $compteId = $user->getAgence()->getCompte()->getId();
+        $transaction = $this->transactionsRepository->getMyTranDe($compteId);
+        // dd($transaction);
+        return $this->json($transaction);
+
+
+    }
+
+
 
     /**
-     * @Route("/api/transactions/mesTransactions",
+     * @Route("/api/transactions/mesTransRetrait",
      * methods={"GET"}
      *     )
      *
      */
 
 
-    public function getTransaction(){
-
+    public function getTransactionR(): JsonResponse
+    {
         $user= $this->security->getUser();
-        $agenceId = $user->getAgence()->getId();
-        $transaction = $this->transactionsRepository->getTransactions($agenceId);
-        // dd($transaction);
-        return $this->json($transaction, 200, [], ['groups'=> 'mesTrans:read']);
-
+        // dd($user);
+        $compteId = $user->getAgence()->getCompte()->getId();
+        $transaction = $this->transactionsRepository->getMyTransRe($compteId);
+       //  dd($transaction);
+        return $this->json($transaction);
 
     }
+
+
+    // Fonctions de Lister Toutes Mes Transactions
+
+    /**
+     * @Route("/api/transactions/toutTransRetrait",
+     * methods={"GET"}
+     *     )
+     *
+     */
+
+
+    public function getTouTransactionR(): JsonResponse
+    {
+        $user= $this->security->getUser();
+        $agenceId = $user->getAgence()->getId();
+        $transaction = $this->transactionsRepository->getTouTransR($agenceId);
+        // dd($transaction);
+        return $this->json($transaction);
+
+    }
+
+
+    /**
+     * @Route("/api/transactions/toutTransDepot",
+     * methods={"GET"}
+     *     )
+     *
+     */
+
+
+    public function getTouTransactionDe(): JsonResponse
+    {
+        $user= $this->security->getUser();
+        $agenceId = $user->getAgence()->getId();
+        $transaction = $this->transactionsRepository->getTouTransD($agenceId);
+        //  dd($transaction);
+        return $this->json($transaction);
+
+    }
+
+
+
+
+
+
+
 }
 

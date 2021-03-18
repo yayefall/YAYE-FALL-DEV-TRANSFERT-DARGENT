@@ -19,19 +19,35 @@ class TransactionsRepository extends ServiceEntityRepository
         parent::__construct($registry, Transactions::class);
     }
 
-
-    public function getTransactions(int  $id)
+// lister mes transaction depot
+    public function getMyTranDe(int  $id)
     {
         return $this->createQueryBuilder('t')
-            ->innerJoin('t.comptes', 'c')
-            ->innerJoin('c.agence', 'a')
-            ->andWhere('a.id = :value')
+            ->innerJoin('t.userDepot', 'u')
+            ->innerJoin('u.agence', 'a')
+            ->innerJoin('a.compte', 'c')
+            ->andWhere('c.id = :value')
+            ->setParameter('value' , $id)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+// lister mes transaction retrait
+
+    public function getMyTransRe(int  $id)
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.userRetrait', 'u')
+            ->innerJoin('u.agence', 'a')
+            ->innerJoin('a.compte', 'c')
+            ->andWhere('c.id = :value')
             ->setParameter('value' , $id)
             ->getQuery()
             ->getResult()
             ;
     }
 
+// lister les depots
 
     public function getDepot(int  $id){
         return $this->createQueryBuilder('t')
@@ -44,7 +60,7 @@ class TransactionsRepository extends ServiceEntityRepository
             ;
 
     }
-
+// lister les retraits
     public function getRetrait(int  $id){
         return $this->createQueryBuilder('t')
             ->innerJoin('t.compteRetrait', 'c')
@@ -55,6 +71,41 @@ class TransactionsRepository extends ServiceEntityRepository
             ->getResult()
             ;
     }
+
+
+// lister toutes les transactions retrait
+
+    public function getTouTransR(int  $id){
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.compteRetrait', 'c')
+            ->innerJoin('c.agence', 'a')
+            ->andWhere('a.id = :value')
+            ->setParameter('value' , $id)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
+// lister toutes les transactions depot
+
+    public function getTouTransD(int  $id){
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.compteDepot', 'c')
+            ->innerJoin('c.agence', 'a')
+            ->andWhere('a.id = :value')
+            ->setParameter('value' , $id)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
+
+
+
+
+
 
 
 
