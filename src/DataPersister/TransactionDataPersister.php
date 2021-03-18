@@ -63,7 +63,7 @@ class TransactionDataPersister implements DataPersisterInterface
                $compte= $user->getAgence()->getCompte();
              // dd($compte);
                $compte->setSolde($compte->getSolde()-$data->getMontant());
-               $data->setComptes($compte);
+               $data->setCompteDepot($compte);
                //dd($data);
                $this->entityManager->persist($data);
                $this->entityManager->flush();

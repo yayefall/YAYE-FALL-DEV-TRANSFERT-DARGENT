@@ -122,7 +122,7 @@ class TransactionsController extends AbstractController
                     $montant = $transaction->getMontant();
                     $dateDepot = $transaction->getDateDepot();
                     $codes =  $transaction->getCode();
-                    $compte = $transaction->getComptes();
+                    $compte = $transaction->getCompteDepot();
                     $partEtat = $transaction->getPartEtat();
                     $partEntreprise = $transaction->getPartEntreprise();
                     $partDepot = $transaction->getPartAgentDepot();
@@ -139,7 +139,7 @@ class TransactionsController extends AbstractController
 
                     $bloctransaction = new BlocTransaction();
                     $bloctransaction->setClients($client);
-                    $bloctransaction->setComptes($compte);
+                    $bloctransaction->setCompteDepot($compte);
                     $bloctransaction->setDateDepot($dateDepot);
                     $bloctransaction->setMontant($montant);
                     $bloctransaction->setPartAgentDepot($partDepot);
@@ -162,24 +162,44 @@ class TransactionsController extends AbstractController
 
 
     /**
-     * @Route("/api/transactions/commission",
+     * @Route("/api/transactions/commissDepot",
      * methods={"GET"}
      *     )
      *
      */
 
-    public function getCommission(): Response
+    public function getCommiDepot(): Response
     {
 
         $user= $this->security->getUser();
         $agenceId = $user->getAgence()->getId();
-        $commission = $this->transactionsRepository->getCommis($agenceId);
+        $commission = $this->transactionsRepository->getDepot($agenceId);
        // dd($commission);
-        return $this->json($commission, 200, [], ['groups'=> 'commis:read']);
+        return $this->json($commission);
 
 
     }
 
+
+
+    /**
+     * @Route("/api/transactions/commissRetrait",
+     * methods={"GET"}
+     *     )
+     *
+     */
+
+    public function getCommiRetrait(): Response
+    {
+
+        $user= $this->security->getUser();
+        $agenceId = $user->getAgence()->getId();
+        $commission = $this->transactionsRepository->getRetrait($agenceId);
+        // dd($commission);
+        return $this->json($commission);
+
+
+    }
 
 
     /**
@@ -195,7 +215,7 @@ class TransactionsController extends AbstractController
         $user= $this->security->getUser();
         $agenceId = $user->getAgence()->getId();
         $transaction = $this->transactionsRepository->getTransactions($agenceId);
-         dd($transaction);
+        // dd($transaction);
         return $this->json($transaction, 200, [], ['groups'=> 'mesTrans:read']);
 
 

@@ -87,12 +87,6 @@ class BlocTransaction
      */
     private $dateRetrait;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="blocTransactions")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"bloctrans:read","bloctrans:write"})
-     */
-    private $comptes;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="blockTransactionDepot")
@@ -107,6 +101,17 @@ class BlocTransaction
      * @Groups({"bloctrans:read","bloctrans:write"})
      */
     private $userRetrait;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="blocTransactionDepot")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $compteDepot;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="blocTransactionRetrait")
+     */
+    private $compteRetrait;
 
 
     public function getId(): ?int
@@ -234,17 +239,6 @@ class BlocTransaction
         return $this;
     }
 
-    public function getComptes(): ?Compte
-    {
-        return $this->comptes;
-    }
-
-    public function setComptes(?Compte $comptes): self
-    {
-        $this->comptes = $comptes;
-
-        return $this;
-    }
 
     public function getUserDepot(): ?User
     {
@@ -266,6 +260,30 @@ class BlocTransaction
     public function setUserRetrait(?User $userRetrait): self
     {
         $this->userRetrait = $userRetrait;
+
+        return $this;
+    }
+
+    public function getCompteDepot(): ?Compte
+    {
+        return $this->compteDepot;
+    }
+
+    public function setCompteDepot(?Compte $compteDepot): self
+    {
+        $this->compteDepot = $compteDepot;
+
+        return $this;
+    }
+
+    public function getCompteRetrait(): ?Compte
+    {
+        return $this->compteRetrait;
+    }
+
+    public function setCompteRetrait(?Compte $compteRetrait): self
+    {
+        $this->compteRetrait = $compteRetrait;
 
         return $this;
     }

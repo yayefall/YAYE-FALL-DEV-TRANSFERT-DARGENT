@@ -63,13 +63,24 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *                      "normalization_context"={"groups"={"trans:read"}},
  *                      "denormalization_context"={"groups"={"trans:write"}},
  *                  },
- *                  "getCommision"={
+ *                  "getCommisionDepot"={
  *                          "method"="get",
- *                          "path"="/transactions/commission",
+ *                          "path"="/transactions/commissDepot",
  *                          "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence'))",
  *                          "security_message"="Vous n'avez pas access à cette Ressource",
- *                          "normalization_context"={"groups"={"commis:read"}},
- *                          "denormalization_context"={"groups"={"commis:write"}},
+ *                          "normalization_context"={"groups"={"commisDepot:read"}},
+ *                          "denormalization_context"={"groups"={"commisDepot:read"}},
+ *
+ *            },
+ *
+ *
+ *         "getCommisionRetrait"={
+ *                          "method"="get",
+ *                          "path"="/transactions/commissRetrait",
+ *                          "security"="(is_granted('ROLE_UserAgence')|| is_granted('ROLE_AdminAgence'))",
+ *                          "security_message"="Vous n'avez pas access à cette Ressource",
+ *                          "normalization_context"={"groups"={"commisRetrait:read"}},
+ *                          "denormalization_context"={"groups"={"commisRetrait:read"}},
  *
  *            },
  *
@@ -117,7 +128,7 @@ class Transactions
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"trans:read","trans:write","client","transaction:read","mesTrans:read"})
+     * @Groups({"trans:read","trans:write","client","transaction:read","mesTrans:read","commisRetrait:read","commisDepot:read"})
      */
     private $montant;
 
@@ -135,13 +146,13 @@ class Transactions
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"trans:read","trans:write","commis:read","mesTrans:read"})
+     * @Groups({"trans:read","trans:write","commisRetrait:read","mesTrans:read"})
      */
     private $partAgentRetrait;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"trans:read","trans:write","commis:read","mesTrans:read"})
+     * @Groups({"trans:read","trans:write","commisDepot:read","mesTrans:read"})
      */
     private $partAgentDepot;
 
@@ -156,12 +167,6 @@ class Transactions
      */
     private $clients;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="transactions")
-     * @Groups({"trans:read","trans:write"})
-     */
-    private $comptes;
-
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactionRetrait")
@@ -171,13 +176,13 @@ class Transactions
 
     /**
      * @ORM\Column(type="date",nullable=true)
-     *  @Groups({"trans:read","trans:write","client","transaction:read","commis:read","mesTrans:read"})
+     *  @Groups({"trans:read","trans:write","client","transaction:read","commisDepot:read","mesTrans:read"})
      */
     private $dateDepot;
 
     /**
      * @ORM\Column(type="date", nullable=true)
-     *  @Groups({"trans:read","trans:write","commis:read","mesTrans:read"})
+     *  @Groups({"trans:read","trans:write","commisRetrait:read","mesTrans:read"})
      */
     private $dateRetrait;
 
@@ -187,6 +192,19 @@ class Transactions
      * @Groups({"trans:read","trans:write","mesTrans:read"})
      */
     private $userDepot;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="transactionDepot")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"trans:read","trans:write"})
+     */
+    private $compteDepot;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="transactionRetrait")
+     * @Groups({"trans:read","trans:write"})
+     */
+    private $compteRetrait;
 
     public function getId(): ?int
     {
@@ -289,17 +307,6 @@ class Transactions
         return $this;
     }
 
-    public function getComptes(): ?Compte
-    {
-        return $this->comptes;
-    }
-
-    public function setComptes(?Compte $comptes): self
-    {
-        $this->comptes = $comptes;
-
-        return $this;
-    }
 
 
     public function getUserRetrait(): ?User
@@ -346,6 +353,30 @@ class Transactions
     public function setUserDepot(?User $userDepot): self
     {
         $this->userDepot = $userDepot;
+
+        return $this;
+    }
+
+    public function getCompteDepot(): ?Compte
+    {
+        return $this->compteDepot;
+    }
+
+    public function setCompteDepot(?Compte $compteDepot): self
+    {
+        $this->compteDepot = $compteDepot;
+
+        return $this;
+    }
+
+    public function getCompteRetrait(): ?Compte
+    {
+        return $this->compteRetrait;
+    }
+
+    public function setCompteRetrait(?Compte $compteRetrait): self
+    {
+        $this->compteRetrait = $compteRetrait;
 
         return $this;
     }

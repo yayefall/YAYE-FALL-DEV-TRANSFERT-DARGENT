@@ -110,10 +110,6 @@ class Compte
      */
     private $users;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Transactions::class, mappedBy="comptes")
-     */
-    private $transactions;
 
     /**
      * @ORM\OneToOne(targetEntity=Agence::class, mappedBy="compte", cascade={"persist", "remove"})
@@ -121,15 +117,33 @@ class Compte
     private $agence;
 
     /**
-     * @ORM\OneToMany(targetEntity=BlocTransaction::class, mappedBy="comptes")
+     * @ORM\OneToMany(targetEntity=Transactions::class, mappedBy="compteDepot")
      */
-    private $blocTransactions;
+    private $transactionDepot;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Transactions::class, mappedBy="compteRetrait")
+     */
+    private $transactionRetrait;
+
+    /**
+     * @ORM\OneToMany(targetEntity=BlocTransaction::class, mappedBy="compteDepot")
+     */
+    private $blocTransactionDepot;
+
+    /**
+     * @ORM\OneToMany(targetEntity=BlocTransaction::class, mappedBy="compteRetrait")
+     */
+    private $blocTransactionRetrait;
 
 
     public function __construct()
     {
-        $this->transactions = new ArrayCollection();
-        $this->blocTransactions = new ArrayCollection();
+
+        $this->transactionDepot = new ArrayCollection();
+        $this->transactionRetrait = new ArrayCollection();
+        $this->blocTransactionDepot = new ArrayCollection();
+        $this->blocTransactionRetrait = new ArrayCollection();
 
     }
 
@@ -199,35 +213,6 @@ class Compte
         return $this;
     }
 
-    /**
-     * @return Collection|Transactions[]
-     */
-    public function getTransactions(): Collection
-    {
-        return $this->transactions;
-    }
-
-    public function addTransaction(Transactions $transaction): self
-    {
-        if (!$this->transactions->contains($transaction)) {
-            $this->transactions[] = $transaction;
-            $transaction->setComptes($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransaction(Transactions $transaction): self
-    {
-        if ($this->transactions->removeElement($transaction)) {
-            // set the owning side to null (unless already changed)
-            if ($transaction->getComptes() === $this) {
-                $transaction->setComptes(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getAgence(): ?Agence
     {
@@ -246,30 +231,121 @@ class Compte
         return $this;
     }
 
+
     /**
-     * @return Collection|BlocTransaction[]
+     * @return Collection|Transactions[]
      */
-    public function getBlocTransactions(): Collection
+    public function getTransactionDepot(): Collection
     {
-        return $this->blocTransactions;
+        return $this->transactionDepot;
     }
 
-    public function addBlocTransaction(BlocTransaction $blocTransaction): self
+    public function addTransactionDepot(Transactions $transactionDepot): self
     {
-        if (!$this->blocTransactions->contains($blocTransaction)) {
-            $this->blocTransactions[] = $blocTransaction;
-            $blocTransaction->setComptes($this);
+        if (!$this->transactionDepot->contains($transactionDepot)) {
+            $this->transactionDepot[] = $transactionDepot;
+            $transactionDepot->setCompteDepot($this);
         }
 
         return $this;
     }
 
-    public function removeBlocTransaction(BlocTransaction $blocTransaction): self
+    public function removeTransactionDepot(Transactions $transactionDepot): self
     {
-        if ($this->blocTransactions->removeElement($blocTransaction)) {
+        if ($this->transactionDepot->removeElement($transactionDepot)) {
             // set the owning side to null (unless already changed)
-            if ($blocTransaction->getComptes() === $this) {
-                $blocTransaction->setComptes(null);
+            if ($transactionDepot->getCompteDepot() === $this) {
+                $transactionDepot->setCompteDepot(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transactions[]
+     */
+    public function getTransactionRetrait(): Collection
+    {
+        return $this->transactionRetrait;
+    }
+
+    public function addTransactionRetrait(Transactions $transactionRetrait): self
+    {
+        if (!$this->transactionRetrait->contains($transactionRetrait)) {
+            $this->transactionRetrait[] = $transactionRetrait;
+            $transactionRetrait->setCompteRetrait($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransactionRetrait(Transactions $transactionRetrait): self
+    {
+        if ($this->transactionRetrait->removeElement($transactionRetrait)) {
+            // set the owning side to null (unless already changed)
+            if ($transactionRetrait->getCompteRetrait() === $this) {
+                $transactionRetrait->setCompteRetrait(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|BlocTransaction[]
+     */
+    public function getBlocTransactionDepot(): Collection
+    {
+        return $this->blocTransactionDepot;
+    }
+
+    public function addBlocTransactionDepot(BlocTransaction $blocTransactionDepot): self
+    {
+        if (!$this->blocTransactionDepot->contains($blocTransactionDepot)) {
+            $this->blocTransactionDepot[] = $blocTransactionDepot;
+            $blocTransactionDepot->setCompteDepot($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBlocTransactionDepot(BlocTransaction $blocTransactionDepot): self
+    {
+        if ($this->blocTransactionDepot->removeElement($blocTransactionDepot)) {
+            // set the owning side to null (unless already changed)
+            if ($blocTransactionDepot->getCompteDepot() === $this) {
+                $blocTransactionDepot->setCompteDepot(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|BlocTransaction[]
+     */
+    public function getBlocTransactionRetrait(): Collection
+    {
+        return $this->blocTransactionRetrait;
+    }
+
+    public function addBlocTransactionRetrait(BlocTransaction $blocTransactionRetrait): self
+    {
+        if (!$this->blocTransactionRetrait->contains($blocTransactionRetrait)) {
+            $this->blocTransactionRetrait[] = $blocTransactionRetrait;
+            $blocTransactionRetrait->setCompteRetrait($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBlocTransactionRetrait(BlocTransaction $blocTransactionRetrait): self
+    {
+        if ($this->blocTransactionRetrait->removeElement($blocTransactionRetrait)) {
+            // set the owning side to null (unless already changed)
+            if ($blocTransactionRetrait->getCompteRetrait() === $this) {
+                $blocTransactionRetrait->setCompteRetrait(null);
             }
         }
 

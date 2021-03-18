@@ -129,14 +129,14 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le name est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write","trans:read"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write","trans:read","mesTrans:read"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank( message="le prenom est obligatoire" )
-     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write","trans:read"})
+     * @Groups({"user:read","user:write","profil:read","profil:write","compte:write","compte:read","agence:write","trans:write","trans:read","mesTrans:read"})
      */
     protected $prenom;
 
