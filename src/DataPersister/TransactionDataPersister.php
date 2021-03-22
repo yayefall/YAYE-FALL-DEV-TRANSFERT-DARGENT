@@ -23,6 +23,7 @@ class TransactionDataPersister implements DataPersisterInterface
     private $requestStack;
 
 
+
     public function __construct(EntityManagerInterface $entityManager,
                                  Security $security, ServiceTransaction $frais,
                                  TransactionsRepository $transactionsRepository,
@@ -32,6 +33,7 @@ class TransactionDataPersister implements DataPersisterInterface
         $this->frais=$frais;
         $this->transactionsRepository=$transactionsRepository;
         $this->requestStack=$requestStack;
+
     }
 
     public function supports($data): bool
@@ -44,6 +46,7 @@ class TransactionDataPersister implements DataPersisterInterface
 
         if(isset($context['collection_operation_name'])){
            // dd($context);
+
            $frais= $this->frais->getFrais($data->getMontant());
 
            $partEtat = ($frais * 40) / 100;
@@ -66,7 +69,9 @@ class TransactionDataPersister implements DataPersisterInterface
                $data->setCompteDepot($compte);
                //dd($data);
                $this->entityManager->persist($data);
+               $this->frais->envoieSms($data->getMontant(), $data->getClients()->getNomClient(),$data->getCode());
                $this->entityManager->flush();
+
 
         }
             return  ($data);

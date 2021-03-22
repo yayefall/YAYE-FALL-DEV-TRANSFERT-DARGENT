@@ -87,6 +87,7 @@ class TransactionsController extends AbstractController
 
     public function getClient( Request $request): Response
     {
+        
       $code = json_decode($request->getContent(), true);
        // dd($code);
         $transaction = $this->transactionsRepository->findOneBy(['code' => $code['code']]);
