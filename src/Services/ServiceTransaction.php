@@ -55,7 +55,7 @@ class ServiceTransaction
     {
 
         $sid = "AC4598fd9103c01b1214f6eae0d2eecf35"; // Your Account SID from www.twilio.com/console
-        $token = "b536feffc9c5fe6c16896a162c5101f6"; // Your Auth Token from www.twilio.com/console
+        $token = "71c9bb2ea4df8554cc709a94c734faea"; // Your Auth Token from www.twilio.com/console
 
         $client = new \Twilio\Rest\Client($sid, $token);
         $message = $client->messages->create(
